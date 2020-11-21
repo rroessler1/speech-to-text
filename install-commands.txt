@@ -1,0 +1,18 @@
+# Google stt
+# set up API key here: https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries
+pip install --upgrade google-cloud-speech
+# Hanzi to Pinyin
+pip install dragonmapper
+# Stuff for SpeechRecognition lib
+pip install SpeechRecognition
+# to get mic to work
+sudo apt-get install portaudio19-dev python-all-dev python3-all-dev && pip install pyaudio
+# to get google cloud tts to work
+pip install google-api-python-client
+pip install oauth2client
+# PocketSphinx
+# Instructions here: https://github.com/Uberi/speech_recognition/blob/master/reference/pocketsphinx.rst
+# ^Also has instructions for how to install additional languages
+sudo apt-get install swig git libpulse-dev libasound2-dev
+pip install pocketsphinx
+
