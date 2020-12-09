@@ -1,9 +1,3 @@
-# import sys
-# sys.path.insert(0, "/home/ross/tts/lib/python3.8/site-packages")
-# sys.path.insert(0, '/home/ross/tts/lib/python38.zip')
-# sys.path.insert(0, "/home/ross/tts/lib/python3.8/")
-# sys.path.insert(0, "/home/ross/tts/lib/python3.8/lib-dynload")
-
 import base64
 import difflib
 import requests
@@ -16,7 +10,7 @@ from aqt.utils import showInfo
 from aqt.qt import *
 from aqt.sound import getAudio
 
-from dragonmapper import hanzi
+from ._vendor.dragonmapper import hanzi
 
 
 # TODO: load from config file
@@ -30,8 +24,8 @@ def test_pronunciation():
     hanzi = mw.reviewer.card.note()["Hanzi"]
     recorded_voice = getAudio(mw, False)
     tts_result = rest_request(recorded_voice)
-    desired_pinyin = pinyintools.to_pinyin(hanzi)
-    heard_pinyin = pinyintools.to_pinyin(tts_result)
+    desired_pinyin = to_pinyin(hanzi)
+    heard_pinyin = to_pinyin(tts_result)
     if desired_pinyin != heard_pinyin:
         showInfo("You were supposed to say: {}\n"
                  "{}\n"
