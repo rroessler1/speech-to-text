@@ -90,35 +90,26 @@ def rest_request(audio_file_path, api_key):
         if r.status_code == 400:
             error_dialog = QErrorMessage(mw)
             error_dialog.setWindowTitle("Check Pronunciation Addon")
-            error_dialog.closeEvent = lambda event: custom_close(error_dialog, event)
             error_dialog.accept = lambda: custom_accept(error_dialog)
             error_dialog.showMessage('Received a 400 Error code; your API key is probably invalid.')
             raise IgnorableError
         # otherwise re-throw the exception
         raise
     data = r.json()
+    if "results" not in data:
+        error_dialog = QErrorMessage(mw)
+        error_dialog.setWindowTitle("Check Pronunciation Addon")
+        error_dialog.showMessage('No results from Speech-to-Text engine; maybe your audio recording was silent or empty?')
+        raise IgnorableError
     transcript = ""
     for result in data["results"]:
         transcript += result["alternatives"][0]["transcript"].strip() + " "
     return transcript
 
 
-def custom_close(self: QErrorMessage, event):
-    QErrorMessage.closeEvent(self, event)
-    settings_dialog()
-
-
 def custom_accept(self: QErrorMessage):
     QErrorMessage.accept(self)
     settings_dialog()
-
-
-def event_filter(self, source, event):
-    if event.type() == QEvent.Close:
-        print('close event')
-        self.closeEvent()
-        settings_dialog()
-    return super(mw, self).eventFilter(source, event)
 
 
 def inline_diff(a, b):
