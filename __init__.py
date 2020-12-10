@@ -20,6 +20,7 @@ SETTINGS_APPLICATION = "stt-anki-plugin"
 API_KEY_SETTING_NAME = "google-stt-api-key"
 FIELD_TO_READ_SETTING_NAME = "field-to-read"
 FIELD_TO_READ_DEFAULT_NAME = "Front"
+CHINESE_LANGUAGE_CODES = {'zh-TW', 'zh', 'yue-Hant-HK', 'cmn-Hans-CN', 'cmn-Hant-TW'}
 
 
 class IgnorableError(Exception):
@@ -33,6 +34,8 @@ def settings_dialog():
 def test_pronunciation():
     api_key = app_settings.value(API_KEY_SETTING_NAME, "", type=str)
     field_to_read = app_settings.value(FIELD_TO_READ_SETTING_NAME, FIELD_TO_READ_DEFAULT_NAME, type=str)
+    # TODO: make language configurable
+    language_code = "en-US"
     if api_key == '':
         settings_dialog()
         return
@@ -44,9 +47,8 @@ def test_pronunciation():
                           True)
         return
 
-    # TODO: rename stuff to be less Chinese specific
-    hanzi = mw.reviewer.card.note()[field_to_read]
-    hanzi = rstrip_punc(hanzi.strip()).strip()
+    to_read_text = mw.reviewer.card.note()[field_to_read]
+    to_read_text = rstrip_punc(to_read_text.strip()).strip()
     # This stores the file as "rec.wav" in the User's media collection.
     # It will overwrite the file every time, so there's no need to delete it after.
     recorded_voice = getAudio(mw, False)
@@ -54,7 +56,7 @@ def test_pronunciation():
     if not recorded_voice:
         return
     try:
-        tts_result = rest_request(recorded_voice, api_key)
+        tts_result = rest_request(recorded_voice, api_key, language_code)
         tts_result = rstrip_punc(tts_result.strip()).strip()
     except IgnorableError:
         return
@@ -62,34 +64,34 @@ def test_pronunciation():
         show_error_dialog(f"ConnectionError, could not access the STT service.\nError: {err}")
         return
 
-    desired_pinyin = to_pinyin(hanzi)
+    to_read_text_pinyin = to_pinyin(to_read_text)
     heard_pinyin = to_pinyin(tts_result)
-    if desired_pinyin != heard_pinyin:
+    if to_read_text != tts_result:
         # TODO: add window title
-        showInfo("You were supposed to say:<br/>"
-                 "{}<br/>"
-                 "{}<br/>"
-                 "But the computer heard you say:<br/>"
-                 "{}<br/>"
-                 "{}<br/>"
-                 "<br/>"
-                 "<span style=\"font-size:x-large\">{}</span><br/>".format(
-            hanzi,
-            desired_pinyin,
-            tts_result,
-            heard_pinyin,
-            inline_diff(hanzi, tts_result)
-        ), textFormat="rich")
+        if language_code in CHINESE_LANGUAGE_CODES:
+            showInfo("You were supposed to say:<br/>{}<br/>{}<br/>"
+                     "But the computer heard you say:<br/>{}<br/>{}<br/><br/>"
+                     "<span style=\"font-size:x-large\">{}</span><br/>".format(
+                to_read_text,
+                to_read_text_pinyin,
+                tts_result,
+                heard_pinyin,
+                inline_diff(to_read_text, tts_result, True)
+            ), textFormat="rich")
+        else:
+            showInfo("You were supposed to say:<br/>{}<br/>"
+                     "But the computer heard you say:<br/>{}<br/><br/>"
+                     "<span style=\"font-size:x-large\">{}</span><br/>".format(
+                to_read_text,
+                tts_result,
+                # TODO: probably lowercase
+                inline_diff(to_read_text, tts_result)
+            ), textFormat="rich")
     else:
-        showInfo("Perfect. The computer heard you say:\n"
-                 "{}\n"
-                 "{}".format(
-            tts_result,
-            heard_pinyin
-        ))
+        showInfo("Correct! The computer heard you say:<br/>{}".format(tts_result))
 
 
-def rest_request(audio_file_path, api_key):
+def rest_request(audio_file_path, api_key, language_code):
     with open(audio_file_path, 'rb') as audio_content:
         encoded_audio = base64.b64encode(audio_content.read())
 
@@ -97,8 +99,7 @@ def rest_request(audio_file_path, api_key):
         "config": {
             "encoding": "ENCODING_UNSPECIFIED",
             "sampleRateHertz": "44100",
-            # TODO: allow language to be configurable
-            "languageCode": "zh-TW"
+            "languageCode": language_code
         },
         "audio": {
             "content": encoded_audio.decode("utf8")
@@ -137,12 +138,12 @@ def show_error_dialog(message: str, show_settings_after: bool=False):
     error_dialog.showMessage(message)
 
 
-def inline_diff(a, b):
+def inline_diff(a, b, is_chinese: bool=False):
     matcher = difflib.SequenceMatcher(None, a, b)
 
     def process_tag(tag, i1, i2, j1, j2):
         if tag == 'equal':
-            return to_pinyin(matcher.a[i1:i2])
+            return to_pinyin(matcher.a[i1:i2]) if is_chinese else matcher.a[i1:i2]
         elif tag == 'replace':
             color = "red"
             seq = matcher.b[j1:j2]
@@ -154,7 +155,7 @@ def inline_diff(a, b):
             seq = matcher.b[j1:j2]
         else:
             assert False, f"Unknown tag {tag}"
-        return f"<span style=\"color:{color}\">{to_pinyin(seq)}</span>"
+        return f"<span style=\"color:{color}\">{to_pinyin(seq) if is_chinese else seq}</span>"
 
     return ''.join(process_tag(*t) for t in matcher.get_opcodes())
 
