@@ -18,17 +18,14 @@ SETTINGS_ORGANIZATION = "rroessler"
 SETTINGS_APPLICATION = "stt-anki-plugin"
 API_KEY_SETTING_NAME = "google-stt-api-key"
 
-# Load API Key from QSettings
-settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
-API_KEY = settings.value(API_KEY_SETTING_NAME, "", type=str)
-
 
 def settings_dialog():
-    SettingsDialog(mw).show()
+    SettingsDialog(app_settings, mw).show()
 
 
 def test_pronunciation():
-    if API_KEY is None or API_KEY == '':
+    api_key = app_settings.value(API_KEY_SETTING_NAME, "", type=str)
+    if api_key == '':
         settings_dialog()
         return
 
@@ -36,7 +33,7 @@ def test_pronunciation():
     # TODO: rename stuff to be less Chinese specific
     hanzi = mw.reviewer.card.note()["Hanzi"]
     recorded_voice = getAudio(mw, False)
-    tts_result = rest_request(recorded_voice)
+    tts_result = rest_request(recorded_voice, api_key)
     desired_pinyin = to_pinyin(hanzi)
     heard_pinyin = to_pinyin(tts_result)
     if desired_pinyin != heard_pinyin:
@@ -63,7 +60,7 @@ def test_pronunciation():
         ))
 
 
-def rest_request(audio_file_path):
+def rest_request(audio_file_path, api_key):
     with open(audio_file_path, 'rb') as audio_content:
         encoded_audio = base64.b64encode(audio_content.read())
 
@@ -79,7 +76,7 @@ def rest_request(audio_file_path):
         }
     }
 
-    r = requests.post("https://speech.googleapis.com/v1/speech:recognize?key={}".format(API_KEY), json=payload)
+    r = requests.post("https://speech.googleapis.com/v1/speech:recognize?key={}".format(api_key), json=payload)
     r.raise_for_status()
     data = r.json()
     transcript = ""
@@ -116,9 +113,10 @@ def to_pinyin(sent):
 
 class SettingsDialog(QDialog):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, my_settings: QSettings, *args, **kwargs):
         super(SettingsDialog, self).__init__(*args, **kwargs)
         self.setWindowTitle("Settings")
+        self.my_settings = my_settings
 
         buttons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
 
@@ -128,7 +126,7 @@ class SettingsDialog(QDialog):
 
         self.text = QLineEdit()
         self.text.setObjectName('text')
-        self.text.setText(API_KEY)
+        self.text.setText(self.my_settings.value(API_KEY_SETTING_NAME, "", type=str))
         label = QLabel("API Key:")
 
         hor = QHBoxLayout()
@@ -141,14 +139,14 @@ class SettingsDialog(QDialog):
         self.setLayout(self.layout)
 
     def accept(self):
-        global API_KEY
-        API_KEY = self.text.text()
-        settings.setValue("api-key", API_KEY)
+        self.my_settings.setValue(API_KEY_SETTING_NAME, self.text.text())
         super(SettingsDialog, self).accept()
 
     def reject(self):
         super(SettingsDialog, self).reject()
 
+
+app_settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
 
 cp_action = QAction("Check Pronunciation", mw)
 cp_action.triggered.connect(test_pronunciation)
