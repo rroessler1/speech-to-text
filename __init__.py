@@ -13,12 +13,25 @@ from aqt.sound import getAudio
 from ._vendor.dragonmapper import hanzi
 
 
-# TODO: load from config file
-with open("API_KEY.txt", 'r') as api_key_file:
-    API_KEY = api_key_file.read()
+# Constants:
+SETTINGS_ORGANIZATION = "rroessler"
+SETTINGS_APPLICATION = "stt-anki-plugin"
+API_KEY_SETTING_NAME = "google-stt-api-key"
+
+# Load API Key from QSettings
+settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
+API_KEY = settings.value(API_KEY_SETTING_NAME, "", type=str)
+
+
+def settings_dialog():
+    SettingsDialog(mw).show()
 
 
 def test_pronunciation():
+    if API_KEY is None or API_KEY == '':
+        settings_dialog()
+        return
+
     # TODO: field should be configurable
     # TODO: rename stuff to be less Chinese specific
     hanzi = mw.reviewer.card.note()["Hanzi"]
@@ -27,12 +40,14 @@ def test_pronunciation():
     desired_pinyin = to_pinyin(hanzi)
     heard_pinyin = to_pinyin(tts_result)
     if desired_pinyin != heard_pinyin:
-        showInfo("You were supposed to say: {}\n"
-                 "{}\n"
-                 "But Google heard you say: {}\n"
-                 "{}\n"
-                 "\n"
-                 "<span style=\"font-size:x-large\">{}</span>".format(
+        showInfo("You were supposed to say:<br/>"
+                 "{}<br/>"
+                 "{}<br/>"
+                 "But the computer heard you say:<br/>"
+                 "{}<br/>"
+                 "{}<br/>"
+                 "<br/>"
+                 "<span style=\"font-size:x-large\">{}</span><br/>".format(
             hanzi,
             desired_pinyin,
             tts_result,
@@ -40,7 +55,7 @@ def test_pronunciation():
             inline_diff(hanzi, tts_result)
         ), textFormat="rich")
     else:
-        showInfo("Perfect. Google heard you say:\n"
+        showInfo("Perfect. The computer heard you say:\n"
                  "{}\n"
                  "{}".format(
             tts_result,
@@ -99,9 +114,46 @@ def to_pinyin(sent):
     return hanzi.to_pinyin(sent, accented=False)
 
 
-# create a new menu item, "test"
-action = QAction("Check Pronunciation", mw)
-# set it to call testFunction when it's clicked
-action.triggered.connect(test_pronunciation)
-# and add it to the tools menu
-mw.form.menuTools.addAction(action)
+class SettingsDialog(QDialog):
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsDialog, self).__init__(*args, **kwargs)
+        self.setWindowTitle("Settings")
+
+        buttons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+
+        self.buttonBox = QDialogButtonBox(buttons)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.text = QLineEdit()
+        self.text.setObjectName('text')
+        self.text.setText(API_KEY)
+        label = QLabel("API Key:")
+
+        hor = QHBoxLayout()
+        hor.addWidget(label)
+        hor.addWidget(self.text)
+
+        self.layout = QVBoxLayout()
+        self.layout.addLayout(hor)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+    def accept(self):
+        global API_KEY
+        API_KEY = self.text.text()
+        settings.setValue("api-key", API_KEY)
+        super(SettingsDialog, self).accept()
+
+    def reject(self):
+        super(SettingsDialog, self).reject()
+
+
+cp_action = QAction("Check Pronunciation", mw)
+cp_action.triggered.connect(test_pronunciation)
+mw.form.menuTools.addAction(cp_action)
+
+cps_action = QAction("Check Pronunciation Settings", mw)
+cps_action.triggered.connect(settings_dialog)
+mw.form.menuTools.addAction(cps_action)
