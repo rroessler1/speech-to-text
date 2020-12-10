@@ -37,7 +37,7 @@ def test_pronunciation():
             desired_pinyin,
             tts_result,
             heard_pinyin,
-            inline_diff(desired_pinyin, heard_pinyin)
+            inline_diff(hanzi, tts_result)
         ), textFormat="rich")
     else:
         showInfo("Perfect. Google heard you say:\n"
@@ -73,21 +73,24 @@ def rest_request(audio_file_path):
     return transcript
 
 
-# TODO: fix diff to parse from R to L (otherwise the accents are parsed weirdly), or just diff on Chinese
 def inline_diff(a, b):
     matcher = difflib.SequenceMatcher(None, a, b)
 
     def process_tag(tag, i1, i2, j1, j2):
-        if tag == 'replace':
-            return f"<span style=\"color:red\">{matcher.b[j1:j2]}</span>"
-            # return '[{}->{}]'.format(matcher.a[i1:i2], matcher.b[j1:j2])
-        if tag == 'delete':
-            return f"<span style=\"color:orange\">{matcher.a[i1:i2]}</span>"
         if tag == 'equal':
-            return matcher.a[i1:i2]
-        if tag == 'insert':
-            return f"<span style=\"color:red\">{matcher.b[j1:j2]}</span>"
-        assert False, "Unknown tag %r"%tag
+            return to_pinyin(matcher.a[i1:i2])
+        elif tag == 'replace':
+            color = "red"
+            seq = matcher.b[j1:j2]
+        elif tag == 'delete':
+            color = "orange"
+            seq = matcher.a[i1:i2]
+        elif tag == 'insert':
+            color = "red"
+            seq = matcher.b[j1:j2]
+        else:
+            assert False, f"Unknown tag {tag}"
+        return f"<span style=\"color:{color}\">{to_pinyin(seq)}</span>"
 
     return ''.join(process_tag(*t) for t in matcher.get_opcodes())
 
