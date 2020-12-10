@@ -1,6 +1,7 @@
 import base64
 import difflib
 import requests
+from unicodedata import category
 
 # import the main window object (mw) from aqt
 from aqt import mw
@@ -36,9 +37,11 @@ def test_pronunciation():
     # TODO: field should be configurable
     # TODO: rename stuff to be less Chinese specific
     hanzi = mw.reviewer.card.note()["Hanzi"]
+    hanzi = rstrip_punc(hanzi.strip()).strip()
     recorded_voice = getAudio(mw, False)
     try:
         tts_result = rest_request(recorded_voice, api_key)
+        tts_result = rstrip_punc(tts_result.strip()).strip()
     except IgnorableError:
         return
     desired_pinyin = to_pinyin(hanzi)
@@ -136,6 +139,15 @@ def inline_diff(a, b):
 
 def to_pinyin(sent):
     return hanzi.to_pinyin(sent, accented=False)
+
+
+def rstrip_punc(s):
+    """ Strips all rightmost punctuation, based on Unicode characters. """
+    ei = len(s)
+    # The startswith('P') indicates punctuation
+    while ei > 0 and category(s[ei - 1]).startswith('P'):
+        ei -= 1
+    return s[:ei]
 
 
 class SettingsDialog(QDialog):
