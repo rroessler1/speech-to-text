@@ -37,13 +37,11 @@ def test_pronunciation():
         settings_dialog()
         return
     if field_to_read not in mw.reviewer.card.note():
-        error_dialog = QErrorMessage(mw)
-        error_dialog.setWindowTitle("Check Pronunciation Addon")
-        error_dialog.accept = lambda: custom_accept(error_dialog)
-        error_dialog.showMessage(f'This plugin needs to know which field you are reading. '
+        show_error_dialog(f'This plugin needs to know which field you are reading. '
                                  f'It\'s looking for a field named: "{field_to_read}", '
                                  f'but there is no field named: "{field_to_read}" on the current card. '
-                                 f'Please check the settings.')
+                                 f'Please check the settings.',
+                          True)
         return
 
     # TODO: rename stuff to be less Chinese specific
@@ -112,18 +110,13 @@ def rest_request(audio_file_path, api_key):
         r.raise_for_status()
     except requests.exceptions.HTTPError:
         if r.status_code == 400:
-            error_dialog = QErrorMessage(mw)
-            error_dialog.setWindowTitle("Check Pronunciation Addon")
-            error_dialog.accept = lambda: custom_accept(error_dialog)
-            error_dialog.showMessage('Received a 400 Error code; your API key is probably invalid.')
+            show_error_dialog('Received a 400 Error code; your API key is probably invalid.', True)
             raise IgnorableError
         # otherwise re-throw the exception
         raise
     data = r.json()
     if "results" not in data:
-        error_dialog = QErrorMessage(mw)
-        error_dialog.setWindowTitle("Check Pronunciation Addon")
-        error_dialog.showMessage('No results from Speech-to-Text engine; maybe your audio recording was silent or empty?')
+        show_error_dialog('No results from Speech-to-Text engine; maybe your audio recording was silent or empty?')
         raise IgnorableError
     transcript = ""
     for result in data["results"]:
