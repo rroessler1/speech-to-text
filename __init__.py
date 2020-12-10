@@ -18,6 +18,8 @@ from ._vendor.dragonmapper import hanzi
 SETTINGS_ORGANIZATION = "rroessler"
 SETTINGS_APPLICATION = "stt-anki-plugin"
 API_KEY_SETTING_NAME = "google-stt-api-key"
+FIELD_TO_READ_SETTING_NAME = "field-to-read"
+FIELD_TO_READ_DEFAULT_NAME = "Front"
 
 
 class IgnorableError(Exception):
@@ -30,13 +32,22 @@ def settings_dialog():
 
 def test_pronunciation():
     api_key = app_settings.value(API_KEY_SETTING_NAME, "", type=str)
+    field_to_read = app_settings.value(FIELD_TO_READ_SETTING_NAME, FIELD_TO_READ_DEFAULT_NAME, type=str)
     if api_key == '':
         settings_dialog()
         return
+    if field_to_read not in mw.reviewer.card.note():
+        error_dialog = QErrorMessage(mw)
+        error_dialog.setWindowTitle("Check Pronunciation Addon")
+        error_dialog.accept = lambda: custom_accept(error_dialog)
+        error_dialog.showMessage(f'This plugin needs to know which field you are reading. '
+                                 f'It\'s looking for a field named: "{field_to_read}", '
+                                 f'but there is no field named: "{field_to_read}" on the current card. '
+                                 f'Please check the settings.')
+        return
 
-    # TODO: field should be configurable
     # TODO: rename stuff to be less Chinese specific
-    hanzi = mw.reviewer.card.note()["Hanzi"]
+    hanzi = mw.reviewer.card.note()[field_to_read]
     hanzi = rstrip_punc(hanzi.strip()).strip()
     recorded_voice = getAudio(mw, False)
     try:
@@ -47,6 +58,7 @@ def test_pronunciation():
     desired_pinyin = to_pinyin(hanzi)
     heard_pinyin = to_pinyin(tts_result)
     if desired_pinyin != heard_pinyin:
+        # TODO: add window title
         showInfo("You were supposed to say:<br/>"
                  "{}<br/>"
                  "{}<br/>"
@@ -163,22 +175,31 @@ class SettingsDialog(QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.text = QLineEdit()
-        self.text.setObjectName('text')
-        self.text.setText(self.my_settings.value(API_KEY_SETTING_NAME, "", type=str))
-        label = QLabel("API Key:")
+        self.api_key_textbox = QLineEdit()
+        self.api_key_textbox.setText(self.my_settings.value(API_KEY_SETTING_NAME, "", type=str))
+        api_setting_label = QLabel("API Key:")
 
-        hor = QHBoxLayout()
-        hor.addWidget(label)
-        hor.addWidget(self.text)
+        self.field_to_read_textbox = QLineEdit()
+        self.field_to_read_textbox.setText(self.my_settings.value(FIELD_TO_READ_SETTING_NAME, FIELD_TO_READ_DEFAULT_NAME, type=str))
+        field_to_read_setting_label = QLabel("Name of Card Field to Read:")
+
+        api_hor = QHBoxLayout()
+        api_hor.addWidget(field_to_read_setting_label)
+        api_hor.addWidget(self.field_to_read_textbox)
+
+        ftr_hor = QHBoxLayout()
+        ftr_hor.addWidget(api_setting_label)
+        ftr_hor.addWidget(self.api_key_textbox)
 
         self.layout = QVBoxLayout()
-        self.layout.addLayout(hor)
+        self.layout.addLayout(api_hor)
+        self.layout.addLayout(ftr_hor)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
     def accept(self):
-        self.my_settings.setValue(API_KEY_SETTING_NAME, self.text.text())
+        self.my_settings.setValue(API_KEY_SETTING_NAME, self.api_key_textbox.text())
+        self.my_settings.setValue(FIELD_TO_READ_SETTING_NAME, self.field_to_read_textbox.text())
         super(SettingsDialog, self).accept()
 
     def reject(self):
