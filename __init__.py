@@ -19,6 +19,10 @@ SETTINGS_APPLICATION = "stt-anki-plugin"
 API_KEY_SETTING_NAME = "google-stt-api-key"
 
 
+class IgnorableError(Exception):
+    pass
+
+
 def settings_dialog():
     SettingsDialog(app_settings, mw).show()
 
@@ -33,7 +37,10 @@ def test_pronunciation():
     # TODO: rename stuff to be less Chinese specific
     hanzi = mw.reviewer.card.note()["Hanzi"]
     recorded_voice = getAudio(mw, False)
-    tts_result = rest_request(recorded_voice, api_key)
+    try:
+        tts_result = rest_request(recorded_voice, api_key)
+    except IgnorableError:
+        return
     desired_pinyin = to_pinyin(hanzi)
     heard_pinyin = to_pinyin(tts_result)
     if desired_pinyin != heard_pinyin:
@@ -77,12 +84,41 @@ def rest_request(audio_file_path, api_key):
     }
 
     r = requests.post("https://speech.googleapis.com/v1/speech:recognize?key={}".format(api_key), json=payload)
-    r.raise_for_status()
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        if r.status_code == 400:
+            error_dialog = QErrorMessage(mw)
+            error_dialog.setWindowTitle("Check Pronunciation Addon")
+            error_dialog.closeEvent = lambda event: custom_close(error_dialog, event)
+            error_dialog.accept = lambda: custom_accept(error_dialog)
+            error_dialog.showMessage('Received a 400 Error code; your API key is probably invalid.')
+            raise IgnorableError
+        # otherwise re-throw the exception
+        raise
     data = r.json()
     transcript = ""
     for result in data["results"]:
         transcript += result["alternatives"][0]["transcript"].strip() + " "
     return transcript
+
+
+def custom_close(self: QErrorMessage, event):
+    QErrorMessage.closeEvent(self, event)
+    settings_dialog()
+
+
+def custom_accept(self: QErrorMessage):
+    QErrorMessage.accept(self)
+    settings_dialog()
+
+
+def event_filter(self, source, event):
+    if event.type() == QEvent.Close:
+        print('close event')
+        self.closeEvent()
+        settings_dialog()
+    return super(mw, self).eventFilter(source, event)
 
 
 def inline_diff(a, b):
