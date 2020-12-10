@@ -49,12 +49,21 @@ def test_pronunciation():
     # TODO: rename stuff to be less Chinese specific
     hanzi = mw.reviewer.card.note()[field_to_read]
     hanzi = rstrip_punc(hanzi.strip()).strip()
+    # This stores the file as "rec.wav" in the User's media collection.
+    # It will overwrite the file every time, so there's no need to delete it after.
     recorded_voice = getAudio(mw, False)
+    # If the user canceled the recording, do nothing and return
+    if not recorded_voice:
+        return
     try:
         tts_result = rest_request(recorded_voice, api_key)
         tts_result = rstrip_punc(tts_result.strip()).strip()
     except IgnorableError:
         return
+    except requests.exceptions.ConnectionError as err:
+        show_error_dialog(f"ConnectionError, could not access the STT service.\nError: {err}")
+        return
+
     desired_pinyin = to_pinyin(hanzi)
     heard_pinyin = to_pinyin(tts_result)
     if desired_pinyin != heard_pinyin:
@@ -125,6 +134,14 @@ def rest_request(audio_file_path, api_key):
 def custom_accept(self: QErrorMessage):
     QErrorMessage.accept(self)
     settings_dialog()
+
+
+def show_error_dialog(message: str, show_settings_after: bool=False):
+    error_dialog = QErrorMessage(mw)
+    error_dialog.setWindowTitle("Check Pronunciation Addon")
+    if show_settings_after:
+        error_dialog.accept = lambda: custom_accept(error_dialog)
+    error_dialog.showMessage(message)
 
 
 def inline_diff(a, b):
