@@ -21,6 +21,14 @@ API_KEY_SETTING_NAME = "google-stt-api-key"
 FIELD_TO_READ_SETTING_NAME = "field-to-read"
 FIELD_TO_READ_DEFAULT_NAME = "Front"
 CHINESE_LANGUAGE_CODES = {'zh-TW', 'zh', 'yue-Hant-HK', 'cmn-Hans-CN', 'cmn-Hant-TW'}
+LANGUAGES_WITHOUT_SPACES = {
+    # Chinese
+    'zh-TW', 'zh', 'yue-Hant-HK', 'cmn-Hans-CN', 'cmn-Hant-TW',
+    # Japanese
+    'ja-JP',
+    # Lao, Thai, Burmese, Khmer
+    'lo-LA', 'th-TH', 'my-MM', 'km-KH'
+}
 
 
 class IgnorableError(Exception):
@@ -64,11 +72,11 @@ def test_pronunciation():
         show_error_dialog(f"ConnectionError, could not access the STT service.\nError: {err}")
         return
 
-    to_read_text_pinyin = to_pinyin(to_read_text)
-    heard_pinyin = to_pinyin(tts_result)
     if to_read_text != tts_result:
         # TODO: add window title
         if language_code in CHINESE_LANGUAGE_CODES:
+            to_read_text_pinyin = to_pinyin(to_read_text)
+            heard_pinyin = to_pinyin(tts_result)
             showInfo("You were supposed to say:<br/>{}<br/>{}<br/>"
                      "But the computer heard you say:<br/>{}<br/>{}<br/><br/>"
                      "<span style=\"font-size:x-large\">{}</span><br/>".format(
@@ -79,13 +87,15 @@ def test_pronunciation():
                 inline_diff(to_read_text, tts_result, True)
             ), textFormat="rich")
         else:
+            diff1 = to_read_text if language_code in LANGUAGES_WITHOUT_SPACES else to_read_text.split()
+            diff2 = tts_result if language_code in LANGUAGES_WITHOUT_SPACES else tts_result.split()
             showInfo("You were supposed to say:<br/>{}<br/>"
                      "But the computer heard you say:<br/>{}<br/><br/>"
                      "<span style=\"font-size:x-large\">{}</span><br/>".format(
                 to_read_text,
                 tts_result,
                 # TODO: probably lowercase
-                inline_diff(to_read_text, tts_result)
+                inline_diff(diff1, diff2)
             ), textFormat="rich")
     else:
         showInfo("Correct! The computer heard you say:<br/>{}".format(tts_result))
@@ -139,11 +149,15 @@ def show_error_dialog(message: str, show_settings_after: bool=False):
 
 
 def inline_diff(a, b, is_chinese: bool=False):
+    # If we receive an array, this will diff words as opposed to letters, which makes more sense
+    # for languages with spaces (like English). So the join_char is used to re-insert the spaces
+    # back between the words and return a str, not a list.
+    join_char = ' ' if isinstance(a, list) else ''
     matcher = difflib.SequenceMatcher(None, a, b)
 
     def process_tag(tag, i1, i2, j1, j2):
         if tag == 'equal':
-            return to_pinyin(matcher.a[i1:i2]) if is_chinese else matcher.a[i1:i2]
+            return join_char.join(to_pinyin(matcher.a[i1:i2]) if is_chinese else matcher.a[i1:i2])
         elif tag == 'replace':
             color = "red"
             seq = matcher.b[j1:j2]
@@ -155,9 +169,9 @@ def inline_diff(a, b, is_chinese: bool=False):
             seq = matcher.b[j1:j2]
         else:
             assert False, f"Unknown tag {tag}"
-        return f"<span style=\"color:{color}\">{to_pinyin(seq) if is_chinese else seq}</span>"
+        return f"<span style=\"color:{color}\">{join_char.join(to_pinyin(seq) if is_chinese else seq)}</span>"
 
-    return ''.join(process_tag(*t) for t in matcher.get_opcodes())
+    return join_char.join(process_tag(*t) for t in matcher.get_opcodes())
 
 
 def to_pinyin(sent):
