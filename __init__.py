@@ -72,7 +72,7 @@ def test_pronunciation():
         show_error_dialog(f"ConnectionError, could not access the STT service.\nError: {err}")
         return
 
-    if to_read_text != tts_result:
+    if to_read_text.lower() != tts_result.lower():
         # TODO: add window title
         if language_code in CHINESE_LANGUAGE_CODES:
             to_read_text_pinyin = to_pinyin(to_read_text)
@@ -87,14 +87,13 @@ def test_pronunciation():
                 inline_diff(to_read_text, tts_result, True)
             ), textFormat="rich")
         else:
-            diff1 = to_read_text if language_code in LANGUAGES_WITHOUT_SPACES else to_read_text.split()
-            diff2 = tts_result if language_code in LANGUAGES_WITHOUT_SPACES else tts_result.split()
+            diff1 = to_read_text.lower() if language_code in LANGUAGES_WITHOUT_SPACES else to_read_text.lower().split()
+            diff2 = tts_result.lower() if language_code in LANGUAGES_WITHOUT_SPACES else tts_result.lower().split()
             showInfo("You were supposed to say:<br/>{}<br/>"
                      "But the computer heard you say:<br/>{}<br/><br/>"
                      "<span style=\"font-size:x-large\">{}</span><br/>".format(
                 to_read_text,
                 tts_result,
-                # TODO: probably lowercase
                 inline_diff(diff1, diff2)
             ), textFormat="rich")
     else:
