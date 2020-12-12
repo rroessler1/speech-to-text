@@ -249,6 +249,7 @@ app_settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
 cp_action = QAction("Check Pronunciation", mw)
 cp_action.triggered.connect(test_pronunciation)
 mw.form.menuTools.addAction(cp_action)
+cp_action.setShortcut(QKeySequence("Ctrl+Shift+S"))
 
 cps_action = QAction("Check Pronunciation Settings", mw)
 cps_action.triggered.connect(settings_dialog)
