@@ -15,11 +15,12 @@ from ._vendor.dragonmapper import hanzi
 
 
 # Constants:
-SETTINGS_ORGANIZATION = "rroessler"
+SETTINGS_ORGANIZATION = "github_rroessler1"
 SETTINGS_APPLICATION = "stt-anki-plugin"
 API_KEY_SETTING_NAME = "google-stt-api-key"
 FIELD_TO_READ_SETTING_NAME = "field-to-read"
 FIELD_TO_READ_DEFAULT_NAME = "Front"
+LANGUAGE_SETTING_NAME = "language-name"
 CHINESE_LANGUAGE_CODES = {'zh-TW', 'zh', 'yue-Hant-HK', 'cmn-Hans-CN', 'cmn-Hant-TW'}
 LANGUAGES_WITHOUT_SPACES = {
     # Chinese
@@ -29,6 +30,8 @@ LANGUAGES_WITHOUT_SPACES = {
     # Lao, Thai, Burmese, Khmer
     'lo-LA', 'th-TH', 'my-MM', 'km-KH'
 }
+SUPPORTED_LANGUAGE_CODES = ['af-ZA', 'sq-AL', 'am-ET', 'ar-DZ', 'ar-BH', 'ar-EG', 'ar-IQ', 'ar-IL', 'ar-JO', 'ar-KW', 'ar-LB', 'ar-MA', 'ar-OM', 'ar-QA', 'ar-SA', 'ar-PS', 'ar-TN', 'ar-AE', 'ar-YE', 'hy-AM', 'az-AZ', 'eu-ES', 'bn-BD', 'bn-IN', 'bs-BA', 'bg-BG', 'my-MM', 'ca-ES', 'yue-Hant-HK', 'zh', 'zh-TW', 'hr-HR', 'cs-CZ', 'da-DK', 'nl-BE', 'nl-NL', 'en-AU', 'en-CA', 'en-GH', 'en-HK', 'en-IN', 'en-IE', 'en-KE', 'en-NZ', 'en-NG', 'en-PK', 'en-PH', 'en-SG', 'en-ZA', 'en-TZ', 'en-GB', 'en-US', 'et-EE', 'fil-PH', 'fi-FI', 'fr-BE', 'fr-CA', 'fr-FR', 'fr-CH', 'gl-ES', 'ka-GE', 'de-AT', 'de-DE', 'de-CH', 'el-GR', 'gu-IN', 'iw-IL', 'hi-IN', 'hu-HU', 'is-IS', 'id-ID', 'it-IT', 'it-CH', 'ja-JP', 'jv-ID', 'kn-IN', 'km-KH', 'ko-KR', 'lo-LA', 'lv-LV', 'lt-LT', 'mk-MK', 'ms-MY', 'ml-IN', 'mr-IN', 'mn-MN', 'ne-NP', 'no-NO', 'fa-IR', 'pl-PL', 'pt-BR', 'pt-PT', 'pa-Guru-IN', 'ro-RO', 'ru-RU', 'sr-RS', 'si-LK', 'sk-SK', 'sl-SI', 'es-AR', 'es-BO', 'es-CL', 'es-CO', 'es-CR', 'es-DO', 'es-EC', 'es-SV', 'es-GT', 'es-HN', 'es-MX', 'es-NI', 'es-PA', 'es-PY', 'es-PE', 'es-PR', 'es-ES', 'es-US', 'es-UY', 'es-VE', 'su-ID', 'sw-KE', 'sw-TZ', 'sv-SE', 'ta-IN', 'ta-MY', 'ta-SG', 'ta-LK', 'te-IN', 'th-TH', 'tr-TR', 'uk-UA', 'ur-IN', 'ur-PK', 'uz-UZ', 'vi-VN', 'zu-ZA']
+SUPPORTED_LANGUAGE_NAMES = ['Afrikaans (South Africa)', 'Albanian (Albania)', 'Amharic (Ethiopia)', 'Arabic (Algeria)', 'Arabic (Bahrain)', 'Arabic (Egypt)', 'Arabic (Iraq)', 'Arabic (Israel)', 'Arabic (Jordan)', 'Arabic (Kuwait)', 'Arabic (Lebanon)', 'Arabic (Morocco)', 'Arabic (Oman)', 'Arabic (Qatar)', 'Arabic (Saudi Arabia)', 'Arabic (State of Palestine)', 'Arabic (Tunisia)', 'Arabic (United Arab Emirates)', 'Arabic (Yemen)', 'Armenian (Armenia)', 'Azerbaijani (Azerbaijan)', 'Basque (Spain)', 'Bengali (Bangladesh)', 'Bengali (India)', 'Bosnian (Bosnia and Herzegovina)', 'Bulgarian (Bulgaria)', 'Burmese (Myanmar)', 'Catalan (Spain)', 'Chinese, Cantonese (Traditional Hong Kong)', 'Chinese, Mandarin (Simplified, China)', 'Chinese, Mandarin (Traditional, Taiwan)', 'Croatian (Croatia)', 'Czech (Czech Republic)', 'Danish (Denmark)', 'Dutch (Belgium)', 'Dutch (Netherlands)', 'English (Australia)', 'English (Canada)', 'English (Ghana)', 'English (Hong Kong)', 'English (India)', 'English (Ireland)', 'English (Kenya)', 'English (New Zealand)', 'English (Nigeria)', 'English (Pakistan)', 'English (Philippines)', 'English (Singapore)', 'English (South Africa)', 'English (Tanzania)', 'English (United Kingdom)', 'English (United States)', 'Estonian (Estonia)', 'Filipino (Philippines)', 'Finnish (Finland)', 'French (Belgium)', 'French (Canada)', 'French (France)', 'French (Switzerland)', 'Galician (Spain)', 'Georgian (Georgia)', 'German (Austria)', 'German (Germany)', 'German (Switzerland)', 'Greek (Greece)', 'Gujarati (India)', 'Hebrew (Israel)', 'Hindi (India)', 'Hungarian (Hungary)', 'Icelandic (Iceland)', 'Indonesian (Indonesia)', 'Italian (Italy)', 'Italian (Switzerland)', 'Japanese (Japan)', 'Javanese (Indonesia)', 'Kannada (India)', 'Khmer (Cambodia)', 'Korean (South Korea)', 'Lao (Laos)', 'Latvian (Latvia)', 'Lithuanian (Lithuania)', 'Macedonian (North Macedonia)', 'Malay (Malaysia)', 'Malayalam (India)', 'Marathi (India)', 'Mongolian (Mongolia)', 'Nepali (Nepal)', 'Norwegian Bokmål (Norway)', 'Persian (Iran)', 'Polish (Poland)', 'Portuguese (Brazil)', 'Portuguese (Portugal)', 'Punjabi (Gurmukhi India)', 'Romanian (Romania)', 'Russian (Russia)', 'Serbian (Serbia)', 'Sinhala (Sri Lanka)', 'Slovak (Slovakia)', 'Slovenian (Slovenia)', 'Spanish (Argentina)', 'Spanish (Bolivia)', 'Spanish (Chile)', 'Spanish (Colombia)', 'Spanish (Costa Rica)', 'Spanish (Dominican Republic)', 'Spanish (Ecuador)', 'Spanish (El Salvador)', 'Spanish (Guatemala)', 'Spanish (Honduras)', 'Spanish (Mexico)', 'Spanish (Nicaragua)', 'Spanish (Panama)', 'Spanish (Paraguay)', 'Spanish (Peru)', 'Spanish (Puerto Rico)', 'Spanish (Spain)', 'Spanish (United States)', 'Spanish (Uruguay)', 'Spanish (Venezuela)', 'Sundanese (Indonesia)', 'Swahili (Kenya)', 'Swahili (Tanzania)', 'Swedish (Sweden)', 'Tamil (India)', 'Tamil (Malaysia)', 'Tamil (Singapore)', 'Tamil (Sri Lanka)', 'Telugu (India)', 'Thai (Thailand)', 'Turkish (Turkey)', 'Ukrainian (Ukraine)', 'Urdu (India)', 'Urdu (Pakistan)', 'Uzbek (Uzbekistan)', 'Vietnamese (Vietnam)', 'Zulu (South Africa)']
 
 
 class IgnorableError(Exception):
@@ -42,8 +45,7 @@ def settings_dialog():
 def test_pronunciation():
     api_key = app_settings.value(API_KEY_SETTING_NAME, "", type=str)
     field_to_read = app_settings.value(FIELD_TO_READ_SETTING_NAME, FIELD_TO_READ_DEFAULT_NAME, type=str)
-    # TODO: make language configurable
-    language_code = "en-US"
+    language_code = SUPPORTED_LANGUAGE_CODES[SUPPORTED_LANGUAGE_NAMES.index(app_settings.value(LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
     if api_key == '':
         settings_dialog()
         return
@@ -69,7 +71,7 @@ def test_pronunciation():
     except IgnorableError:
         return
     except requests.exceptions.ConnectionError as err:
-        show_error_dialog(f"ConnectionError, could not access the STT service.\nError: {err}")
+        show_error_dialog(f"ConnectionError, could not access the Google Speech-to-Text service.\nError: {err}")
         return
 
     if to_read_text.lower() != tts_result.lower():
@@ -126,7 +128,7 @@ def rest_request(audio_file_path, api_key, language_code):
         raise
     data = r.json()
     if "results" not in data:
-        show_error_dialog('No results from Speech-to-Text engine; maybe your audio recording was silent or empty?')
+        show_error_dialog('No results from Google Speech-to-Text service; maybe your audio recording was silent or empty?')
         raise IgnorableError
     transcript = ""
     for result in data["results"]:
@@ -201,29 +203,41 @@ class SettingsDialog(QDialog):
 
         self.api_key_textbox = QLineEdit()
         self.api_key_textbox.setText(self.my_settings.value(API_KEY_SETTING_NAME, "", type=str))
-        api_setting_label = QLabel("API Key:")
+        api_setting_label = QLabel("Google Speech-to-Text API Key:")
 
         self.field_to_read_textbox = QLineEdit()
         self.field_to_read_textbox.setText(self.my_settings.value(FIELD_TO_READ_SETTING_NAME, FIELD_TO_READ_DEFAULT_NAME, type=str))
         field_to_read_setting_label = QLabel("Name of Card Field to Read:")
 
+        self.select_language_dropdown = QComboBox()
+        for ln in SUPPORTED_LANGUAGE_NAMES:
+            self.select_language_dropdown.addItem(ln)
+        self.select_language_dropdown.setCurrentText(self.my_settings.value(LANGUAGE_SETTING_NAME, '', type=str))
+        select_language_label = QLabel("Language:")
+
         api_hor = QHBoxLayout()
-        api_hor.addWidget(field_to_read_setting_label)
-        api_hor.addWidget(self.field_to_read_textbox)
+        api_hor.addWidget(api_setting_label)
+        api_hor.addWidget(self.api_key_textbox)
 
         ftr_hor = QHBoxLayout()
-        ftr_hor.addWidget(api_setting_label)
-        ftr_hor.addWidget(self.api_key_textbox)
+        ftr_hor.addWidget(field_to_read_setting_label)
+        ftr_hor.addWidget(self.field_to_read_textbox)
+
+        sld_hor = QHBoxLayout()
+        sld_hor.addWidget(select_language_label)
+        sld_hor.addWidget(self.select_language_dropdown)
 
         self.layout = QVBoxLayout()
-        self.layout.addLayout(api_hor)
+        self.layout.addLayout(sld_hor)
         self.layout.addLayout(ftr_hor)
+        self.layout.addLayout(api_hor)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
     def accept(self):
         self.my_settings.setValue(API_KEY_SETTING_NAME, self.api_key_textbox.text())
         self.my_settings.setValue(FIELD_TO_READ_SETTING_NAME, self.field_to_read_textbox.text())
+        self.my_settings.setValue(LANGUAGE_SETTING_NAME, self.select_language_dropdown.currentText())
         super(SettingsDialog, self).accept()
 
     def reject(self):
