@@ -149,6 +149,14 @@ def show_error_dialog(message: str, show_settings_after: bool=False):
     error_dialog.showMessage(message)
 
 
+def show_donate_dialog():
+    donate_dialog = QMessageBox(mw)
+    donate_dialog.setWindowTitle("Check Pronunciation Addon")
+    donate_dialog.setText("We're extremely grateful for your support! "
+                          "Donate here: <a href=\"https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W\">https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W</a>")
+    donate_dialog.show()
+
+
 def inline_diff(a, b, is_chinese: bool=False):
     # If we receive an array, this will diff words as opposed to letters, which makes more sense
     # for languages with spaces (like English). So the join_char is used to re-insert the spaces
@@ -215,6 +223,11 @@ class SettingsDialog(QDialog):
         self.select_language_dropdown.setCurrentText(self.my_settings.value(LANGUAGE_SETTING_NAME, '', type=str))
         select_language_label = QLabel("Language:")
 
+        self.donateButton = QPushButton()
+        self.donateButton.setText("Donate \u2764")
+        self.donateButton.setFixedWidth(90)
+        self.donateButton.clicked.connect(show_donate_dialog)
+
         api_hor = QHBoxLayout()
         api_hor.addWidget(api_setting_label)
         api_hor.addWidget(self.api_key_textbox)
@@ -231,6 +244,7 @@ class SettingsDialog(QDialog):
         self.layout.addLayout(sld_hor)
         self.layout.addLayout(ftr_hor)
         self.layout.addLayout(api_hor)
+        self.layout.addWidget(self.donateButton)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
