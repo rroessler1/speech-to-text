@@ -15,6 +15,7 @@ from ._vendor.dragonmapper import hanzi
 
 
 # Constants:
+WINDOW_NAME = "Test Your Pronunciation"
 SETTINGS_ORGANIZATION = "github_rroessler1"
 SETTINGS_APPLICATION = "stt-anki-plugin"
 API_KEY_SETTING_NAME = "google-stt-api-key"
@@ -46,7 +47,7 @@ def test_pronunciation():
     api_key = app_settings.value(API_KEY_SETTING_NAME, "", type=str)
     field_to_read = app_settings.value(FIELD_TO_READ_SETTING_NAME, FIELD_TO_READ_DEFAULT_NAME, type=str)
     language_code = SUPPORTED_LANGUAGE_CODES[SUPPORTED_LANGUAGE_NAMES.index(app_settings.value(LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
-    if api_key == '':
+    if api_key == '' or not mw.reviewer.card:
         settings_dialog()
         return
     if field_to_read not in mw.reviewer.card.note():
@@ -143,7 +144,7 @@ def custom_accept(self: QErrorMessage):
 
 def show_error_dialog(message: str, show_settings_after: bool=False):
     error_dialog = QErrorMessage(mw)
-    error_dialog.setWindowTitle("Check Pronunciation Addon")
+    error_dialog.setWindowTitle(WINDOW_NAME)
     if show_settings_after:
         error_dialog.accept = lambda: custom_accept(error_dialog)
     error_dialog.showMessage(message)
@@ -151,7 +152,7 @@ def show_error_dialog(message: str, show_settings_after: bool=False):
 
 def show_donate_dialog():
     donate_dialog = QMessageBox(mw)
-    donate_dialog.setWindowTitle("Check Pronunciation Addon")
+    donate_dialog.setWindowTitle(WINDOW_NAME)
     donate_dialog.setText("We're extremely grateful for your support! "
                           "Donate here: <a href=\"https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W\">https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W</a>")
     donate_dialog.show()
@@ -200,7 +201,7 @@ class SettingsDialog(QDialog):
 
     def __init__(self, my_settings: QSettings, *args, **kwargs):
         super(SettingsDialog, self).__init__(*args, **kwargs)
-        self.setWindowTitle("Settings")
+        self.setWindowTitle(WINDOW_NAME + " Settings")
         self.my_settings = my_settings
 
         buttons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -260,11 +261,11 @@ class SettingsDialog(QDialog):
 
 app_settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
 
-cp_action = QAction("Check Pronunciation", mw)
+cp_action = QAction("Test Your Pronunciation", mw)
 cp_action.triggered.connect(test_pronunciation)
 mw.form.menuTools.addAction(cp_action)
 cp_action.setShortcut(QKeySequence("Ctrl+Shift+S"))
 
-cps_action = QAction("Check Pronunciation Settings", mw)
+cps_action = QAction("Test Your Pronunciation Settings", mw)
 cps_action.triggered.connect(settings_dialog)
 mw.form.menuTools.addAction(cps_action)
