@@ -200,15 +200,6 @@ def remove_html(s):
     return re.sub(REMOVE_HTML_RE, '', s)
 
 
-def rstrip_punc(s):
-    """ Strips all rightmost punctuation, based on Unicode characters. """
-    ei = len(s)
-    # The startswith('P') indicates punctuation
-    while ei > 0 and category(s[ei - 1]).startswith('P'):
-        ei -= 1
-    return s[:ei]
-
-
 # One disadvantage of doing it this way is that the output will look less correct (such as "dont" and "crosscountry").
 # Alternately, I could only remove punctuation from beginning and end of words for space segmented languages.
 # But that's more complex and also error prone if the input has hyphens but the STT output doesn't.
