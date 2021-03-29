@@ -10,7 +10,7 @@ from aqt import mw
 from aqt.utils import showInfo
 # import all of the Qt GUI library
 from aqt.qt import *
-from aqt.sound import getAudio
+from aqt.sound import record_audio
 
 from ._vendor.dragonmapper import hanzi
 
@@ -38,6 +38,7 @@ SUPPORTED_LANGUAGE_NAMES = ['Afrikaans (South Africa)', 'Albanian (Albania)', 'A
 PUNCTUATION_TABLE = dict.fromkeys(i for i in range(sys.maxunicode) if category(chr(i)).startswith('P'))
 REMOVE_HTML_RE = re.compile('<[^<]+?>')
 
+
 class IgnorableError(Exception):
     pass
 
@@ -63,52 +64,24 @@ def test_pronunciation():
 
     to_read_text = mw.reviewer.card.note()[field_to_read]
     to_read_text = strip_all_punc(remove_html(to_read_text)).strip()
+
+    def after_record(recorded_voice):
+        # If the user canceled the recording, do nothing and return
+        if not recorded_voice:
+            return
+        try:
+            tts_result = rest_request(recorded_voice, api_key, language_code)
+            tts_result = strip_all_punc(tts_result).strip()
+            diff_and_show_result(to_read_text, tts_result, language_code)
+        except IgnorableError:
+            return
+        except requests.exceptions.ConnectionError as err:
+            show_error_dialog(f"ConnectionError, could not access the Google Speech-to-Text service.\nError: {err}")
+            return
+
     # This stores the file as "rec.wav" in the User's media collection.
     # It will overwrite the file every time, so there's no need to delete it after.
-    recorded_voice = getAudio(mw, False)
-    # If the user canceled the recording, do nothing and return
-    if not recorded_voice:
-        return
-    try:
-        tts_result = rest_request(recorded_voice, api_key, language_code)
-        tts_result = strip_all_punc(tts_result).strip()
-    except IgnorableError:
-        return
-    except requests.exceptions.ConnectionError as err:
-        show_error_dialog(f"ConnectionError, could not access the Google Speech-to-Text service.\nError: {err}")
-        return
-
-    # idea: either completely remove all punctuation for both sentences, or remove it from beginning and end of words
-    # for space-segmented languages
-    # pros: overall better diff accuracy and more likely to report to user as correct
-    # cons: might make diff look slightly weirder due to lack of punctuation
-    # cons of first method specifically: with things like "dont" or "crosscountry"
-    if to_read_text.lower() != tts_result.lower():
-        # TODO: add window title
-        if language_code in CHINESE_LANGUAGE_CODES:
-            to_read_text_pinyin = to_pinyin(to_read_text)
-            heard_pinyin = to_pinyin(tts_result)
-            showInfo("You were supposed to say:<br/>{}<br/>{}<br/>"
-                     "But the computer heard you say:<br/>{}<br/>{}<br/><br/>"
-                     "<span style=\"font-size:x-large\">{}</span><br/>".format(
-                to_read_text,
-                to_read_text_pinyin,
-                tts_result,
-                heard_pinyin,
-                inline_diff(to_read_text, tts_result, True)
-            ), textFormat="rich")
-        else:
-            diff1 = to_read_text.lower() if language_code in LANGUAGES_WITHOUT_SPACES else to_read_text.lower().split()
-            diff2 = tts_result.lower() if language_code in LANGUAGES_WITHOUT_SPACES else tts_result.lower().split()
-            showInfo("You were supposed to say:<br/>{}<br/>"
-                     "But the computer heard you say:<br/>{}<br/><br/>"
-                     "<span style=\"font-size:x-large\">{}</span><br/>".format(
-                to_read_text,
-                tts_result,
-                inline_diff(diff1, diff2)
-            ), textFormat="rich")
-    else:
-        showInfo("Correct! The computer heard you say:<br/>{}".format(tts_result))
+    record_audio(mw, mw, False, after_record)
 
 
 def rest_request(audio_file_path, api_key, language_code):
@@ -145,25 +118,38 @@ def rest_request(audio_file_path, api_key, language_code):
     return transcript
 
 
-def custom_accept(self: QErrorMessage):
-    QErrorMessage.accept(self)
-    settings_dialog()
-
-
-def show_error_dialog(message: str, show_settings_after: bool=False):
-    error_dialog = QErrorMessage(mw)
-    error_dialog.setWindowTitle(WINDOW_NAME)
-    if show_settings_after:
-        error_dialog.accept = lambda: custom_accept(error_dialog)
-    error_dialog.showMessage(message)
-
-
-def show_donate_dialog():
-    donate_dialog = QMessageBox(mw)
-    donate_dialog.setWindowTitle(WINDOW_NAME)
-    donate_dialog.setText("We're extremely grateful for your support! "
-                          "Donate here: <a href=\"https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W\">https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W</a>")
-    donate_dialog.show()
+def diff_and_show_result(to_read_text, tts_result, language_code):
+    # idea: either completely remove all punctuation for both sentences, or remove it from beginning and end of words
+    # for space-segmented languages
+    # pros: overall better diff accuracy and more likely to report to user as correct
+    # cons: might make diff look slightly weirder due to lack of punctuation
+    # cons of first method specifically: with things like "dont" or "crosscountry"
+    if to_read_text.lower() != tts_result.lower():
+        # TODO: add window title
+        if language_code in CHINESE_LANGUAGE_CODES:
+            to_read_text_pinyin = to_pinyin(to_read_text)
+            heard_pinyin = to_pinyin(tts_result)
+            showInfo("You were supposed to say:<br/>{}<br/>{}<br/>"
+                     "But the computer heard you say:<br/>{}<br/>{}<br/><br/>"
+                     "<span style=\"font-size:x-large\">{}</span><br/>".format(
+                to_read_text,
+                to_read_text_pinyin,
+                tts_result,
+                heard_pinyin,
+                inline_diff(to_read_text, tts_result, True)
+            ), textFormat="rich")
+        else:
+            diff1 = to_read_text.lower() if language_code in LANGUAGES_WITHOUT_SPACES else to_read_text.lower().split()
+            diff2 = tts_result.lower() if language_code in LANGUAGES_WITHOUT_SPACES else tts_result.lower().split()
+            showInfo("You were supposed to say:<br/>{}<br/>"
+                     "But the computer heard you say:<br/>{}<br/><br/>"
+                     "<span style=\"font-size:x-large\">{}</span><br/>".format(
+                to_read_text,
+                tts_result,
+                inline_diff(diff1, diff2)
+            ), textFormat="rich")
+    else:
+        showInfo("Correct! The computer heard you say:<br/>{}".format(tts_result))
 
 
 def inline_diff(a, b, is_chinese: bool=False):
@@ -205,6 +191,27 @@ def remove_html(s):
 # But that's more complex and also error prone if the input has hyphens but the STT output doesn't.
 def strip_all_punc(s):
     return s.translate(PUNCTUATION_TABLE)
+
+
+def custom_accept(self: QErrorMessage):
+    QErrorMessage.accept(self)
+    settings_dialog()
+
+
+def show_error_dialog(message: str, show_settings_after: bool=False):
+    error_dialog = QErrorMessage(mw)
+    error_dialog.setWindowTitle(WINDOW_NAME)
+    if show_settings_after:
+        error_dialog.accept = lambda: custom_accept(error_dialog)
+    error_dialog.showMessage(message)
+
+
+def show_donate_dialog():
+    donate_dialog = QMessageBox(mw)
+    donate_dialog.setWindowTitle(WINDOW_NAME)
+    donate_dialog.setText("We're extremely grateful for your support! "
+                          "Donate here: <a href=\"https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W\">https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W</a>")
+    donate_dialog.show()
 
 
 class SettingsDialog(QDialog):
