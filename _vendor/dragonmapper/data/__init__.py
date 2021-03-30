@@ -19,6 +19,6 @@ def load_data_file(filename, encoding='utf-8'):
         encoding: The file encoding. Defaults to utf-8.
 
     """
-    return open((os.path.dirname(os.path.realpath(__file__)) + '/' + filename)).read().splitlines()
+    return open((os.path.dirname(os.path.realpath(__file__)) + '/' + filename), encoding=encoding).read().splitlines()
     # data = pkgutil.get_data(PACKAGE_NAME, os.path.join(DATA_DIR, filename))
     # return data.decode(encoding).splitlines()
