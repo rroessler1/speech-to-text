@@ -6,36 +6,36 @@ This add-on tests your pronunciation by recording your voice, analyzing it using
 
 <b>HOW TO USE</b>
 
-1. You need a Google Speech-to-Text API Key. Follow the instructions here: https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries
+1. You need a Google Speech-to-Text API Key. Follow the instructions here: <a href="https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries" rel="nofollow">https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries</a>
 
 Basically,
 
-1.1. Go here: https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries and click the "Set up a Project" button.
+1.1. Go here: <a href="https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries" rel="nofollow">https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries</a> and click the "Set up a Project" button.
 
 1.2. Follow the steps to create a project and add a payment method.
 
 2. Create an API Key.  (Google will automatically generate a "Service Account Key" but this is not what you want.)
 
-2.1. Go to the developers console: https://console.developers.google.com/
+2.1. Go to the developers console: <a href="https://console.developers.google.com/" rel="nofollow">https://console.developers.google.com/</a>
 
 2.2. Click on "Credentials"
 
-2.3. Click on "Create Credentials -> API Key" and copy the value.
+2.3. Click on "Create Credentials -&gt; API Key" and copy the value.
 
-3. Once you install this add-on, configure it in Anki.  Go to Tools -> Test Your Pronunciation Settings
+3. Once you install this add-on, configure it in Anki.  Go to Tools -&gt; Test Your Pronunciation Settings
 
 3.1. Enter the API Key you created above.
 
 3.2. Choose which language you will be reading.
 
 3.3. Enter the Field Name you will read. This is used to compare your voice to the actual value on the card.
-(If you are unfamiliar with Anki fields it is the number one feature you should understand, check it out here: https://docs.ankiweb.net/#/getting-started?id=notes-amp-fields )
+(If you are unfamiliar with Anki fields it is the number one feature you should understand, check it out here: <a href="https://docs.ankiweb.net/#/getting-started?id=notes-amp-fields" rel="nofollow">https://docs.ankiweb.net/#/getting-started?id=notes-amp-fields</a> )
 
-4. Whenever you study a card, you can go to "Tools -> Test Your Pronunciation" (or press Ctrl + Shift + S) to activate the plugin. Record your voice and then view the results.
+4. Whenever you study a card, you can go to "Tools -&gt; Test Your Pronunciation" (or press Ctrl + Shift + S) to activate the plugin. Record your voice and then view the results.
 
 <b>Google Speech-to-Text Pricing</b>
 
-The current pricing details are here: https://cloud.google.com/speech-to-text/pricing
+The current pricing details are here: <a href="https://cloud.google.com/speech-to-text/pricing" rel="nofollow">https://cloud.google.com/speech-to-text/pricing</a>
 
 Currently, the first 60 minutes per month are free, and then it's $0.004 or $0.006 USD per 15 seconds, depending on if you enable data logging.
 
@@ -52,44 +52,41 @@ How accurate is Speech-to-Text?
 
 I initially developed this plugin to help me practice Chinese; I'm a beginner learner and my pronunciation is quite bad, something many learners struggle with.
 
-Olle over at Hacking Chinese did a not-statistically-significant analysis, and found that Google's Chinese Speech-to-Text is basically perfect: https://www.hackingchinese.com/using-speech-recognition-to-improve-chinese-pronunciation-part-1/
+Olle over at Hacking Chinese did a not-statistically-significant analysis, and found that Google's Chinese Speech-to-Text is basically perfect: <a href="https://www.hackingchinese.com/using-speech-recognition-to-improve-chinese-pronunciation-part-1/" rel="nofollow">https://www.hackingchinese.com/using-speech-recognition-to-improve-chinese-pronunciation-part-1/</a>
 
 My Chinese friends (again, not statistically significant) also report that Google "always" gets their Chinese dictation correct.
 
-This initially seems impossible given the "difficulty" of Chinese pronunciation, but if you think again it intuitively makes sense.
-The tones, while difficult for foreigners unfamiliar with tonal languages, provide an extra signal for the algorithm that makes it easier to identify the syllable/word.
-Native speakers who can produce this perfectly see accurate results.
+This initially seems impossible given the "difficulty" of Chinese pronunciation, but if you think again it intuitively makes sense. The tones, while difficult for foreigners unfamiliar with tonal languages, provide an extra signal for the algorithm that makes it easier to identify the syllable/word. Native speakers who can produce this perfectly see accurate results.
 
-Now of course, even if you don't say things perfectly, the algorithm tries to figure it out. So a reasonable conclusion is that: 
-<b>If the computer thinks you said it wrong, you did, but if the computer thinks you said it right, it still might sound weird to a native.</b>
-At least for Chinese (and presumably other tonal languages, though I haven't checked).
+Now of course, even if you don't say things perfectly, the algorithm tries to figure it out. So a reasonable conclusion is that: <b>If the computer thinks you said it wrong, you did, but if the computer thinks you said it right, it still might sound weird to a native.</b> At least for Chinese (and presumably other tonal languages, though I haven't checked).
 
 What about for other languages?
 
 Well, Google is certainly not 100% accurate when I do Speech-to-Text for English, but if I speak a bit slow and clearly, I would say it's quite good.
 
+<b>Punctuation</b>
+
+The plugin ignores punctuation when analyzing the card and your speech, so if the card reads:
+"Hello! How are you?"
+You can say "Hello how are you" and it will be correct.
+(You can also say "Hello exclamation mark how are you question mark", and that will work too.)
+
+But one limitation of this is that decimal points are also removed, so if the card reads:
+"3.5"
+You can say "Three point five" or "Thirty-five", and both will be marked as correct
+
 <b>Using this with Chinese</b>
 
 This plugin will show your results in Pinyin, to make it easier for beginners to see what they got wrong, and whether it was a tone issue or not.
 
-<b>Plugin Limitations</b>
-
-Speech-to-Text does not automatically add punctuation or capitalization, so sometimes this plugin might say your results were
-incorrect simply because they were missing a comma or something. But it shows you the difference, so it's easy to tell if you truly did make a mistake, or not.
-
-I do a few tricks to try and make the comparison more intelligent, such as removing ending punctuation and lowercasing the sentences.
-
-At least for English, Google does correctly interpret verbal punctuation.
-So if you say "Hello slash how are you", it will return "hello / how are you".
-
 <b>Issues / Feedback</b>
 
-Please submit any issues on Github: https://github.com/rroessler1/speech-to-text
+Please submit any issues on Github: <a href="https://github.com/rroessler1/speech-to-text" rel="nofollow">https://github.com/rroessler1/speech-to-text</a>
 
 <b>Donate</b>
 
 If you find my work helpful, I would be honored with any kind of donation, as it does take a very surprisingly long time to develop software available for public use.
 
-https://www.paypal.com/donate?hosted_button_id=5SMQLVSC5XA5W
+<a href="https://www.paypal.com/donate?hosted_button_id=5SMQLVSC5XA5W" rel="nofollow">https://www.paypal.com/donate?hosted_button_id=5SMQLVSC5XA5W</a>
 
 If you like it, please comment here or send me feedback!
