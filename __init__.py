@@ -79,7 +79,7 @@ def test_pronunciation():
             show_error_dialog(f"ConnectionError, could not access the Google Speech-to-Text service.\nError: {err}")
             return
 
-    # This stores the file as "rec.wav" in the User's media collection.
+    # This stores the file as "rec.wav" in a tmp directory (for me it's /tmp/anki_tmp/rec.wav)
     # It will overwrite the file every time, so there's no need to delete it after.
     record_audio(mw, mw, False, after_record)
 
