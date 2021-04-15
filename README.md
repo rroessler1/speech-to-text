@@ -2,11 +2,17 @@ This is an Anki addon, NOT a standalone Python program. You can add it to Anki a
 
 <b>Plugin Info</b>
 
-This add-on tests your pronunciation by recording your voice, analyzing it using Google Speech-to-Text (STT), and then comparing it with the value on the current card.
+This add-on tests your pronunciation by recording your voice, analyzing it using a Speech-to-Text (STT) service, and then comparing it with the value on the current card.
+
+It currently supports Google and Microsoft Cloud Speech-to-Text services.
 
 <b>HOW TO USE</b>
 
-1. You need a Google Speech-to-Text API Key. Follow the instructions here: <a href="https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries" rel="nofollow">https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries</a>
+You need either a Google or Microsoft API key. Here are instructions for both:
+
+<b>Google</b>
+
+Follow the instructions here: <a href="https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries" rel="nofollow">https://cloud.google.com/speech-to-text/docs/quickstart-client-libraries</a>, which are summarized below.
 
 Basically,
 
@@ -22,29 +28,76 @@ Basically,
 
 2.3. Click on "Create Credentials -&gt; API Key" and copy the value.
 
-3. Once you install this add-on, configure it in Anki.  Go to Tools -&gt; Test Your Pronunciation Settings
+<b>Microsoft</b>
 
-3.1. Enter the API Key you created above.
+1. Create a Microsoft Portal Account http://portal.azure.com
 
-3.2. Choose which language you will be reading.
+2. Create a "Speech" by Microsoft resource here: https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices
+(None of the naming / settings are particularly important)
 
-3.3. Enter the Field Name you will read. This is used to compare your voice to the actual value on the card.
+3. Once that's done, click on "Go to Resource"
+
+4. Click on "Keys and Endpoint"
+
+5. Click on "Show Keys". These are your two API keys. Use either.
+
+6. Take note of "location", you'll need it in the configuration.
+
+<b>Once You Have an API Key</b>
+
+Install this add-on, then configure it in Anki.  Go to Tools -&gt; Test Your Pronunciation Settings
+
+1. Select which service you will use (Google or Microsoft)
+
+2. Enter the API Key you created above.
+
+2.1 If using Microsoft, you also need to select the API location (explained above).
+
+3. Choose which language you will be pronouncing.
+
+4. Enter the Field Name you will read. This is used to compare your voice to the actual value on the card.
 (If you are unfamiliar with Anki fields it is the number one feature you should understand, check it out here: <a href="https://docs.ankiweb.net/#/getting-started?id=notes-amp-fields" rel="nofollow">https://docs.ankiweb.net/#/getting-started?id=notes-amp-fields</a> )
 
-4. Whenever you study a card, you can go to "Tools -&gt; Test Your Pronunciation" (or press Ctrl + Shift + S) to activate the plugin. Record your voice and then view the results.
+5. Whenever you study a card, you can go to "Tools -&gt; Test Your Pronunciation" (or press Ctrl + Shift + S) to activate the plugin. Record your voice and then view the results.
 
-<b>Google Speech-to-Text Pricing</b>
+<b>Cloud Speech-to-Text Pricing</b>
+
+Please note this is the price charged by Google and Microsoft to use their Cloud Speech-to-Text services, and is completely out of my control.
+
+<b>Google</b>
 
 The current pricing details are here: <a href="https://cloud.google.com/speech-to-text/pricing" rel="nofollow">https://cloud.google.com/speech-to-text/pricing</a>
 
-Currently, the first 60 minutes per month are free, and then it's $0.004 or $0.006 USD per 15 seconds, depending on if you enable data logging.
+The first 60 minutes per month are free, and then it's $0.004 or $0.006 USD per 15 seconds, depending on if you enable data logging.
 
 If you test your pronunciation on 100 cards every day (and each audio clip is 15 seconds or less), then it will cost you:
 (3000 cards per month - 240 (free tier)) * $0.006 = $16.56 USD / month.  Or $11.04 if you enable data logging.
 
-Unfortunately, this is obviously out of my control. But you can choose when to test your pronunciation, so you can choose to only test it a few times a day if you prefer.
+<b>Microsoft</b>
 
-At least, it is exponentially cheaper than hiring a tutor.
+Pricing details are here: https://azure.microsoft.com/en-us/pricing/details/cognitive-services/speech-services/ but are unclear
+
+On the Free Tier, you get 5 free hours of audio. Presumably, if you use more than this, it costs $1 per hour, which is what the standard tier costs.
+
+If you test your pronunciation on 100 cards every day, and the average clip length is 6 seconds, then it will cost you:
+30 days * 100 cards * 6 seconds / 3600 seconds in an hour = 5 hours = <b>Free</b>
+
+If the average clip length is 15 seconds, it will cost you $7.50 USD per month.
+
+<b>Punctuation</b>
+
+The plugin ignores punctuation when analyzing the card and your speech, so if the card reads:
+"Hello! How are you?"
+You can say "Hello how are you" and it will be correct.
+(You can also say "Hello exclamation mark how are you question mark", and that will work too.)
+
+But one limitation of this is that decimal points are also removed, so if the card reads:
+"3.5"
+You can say "Three point five" or "Thirty-five", and both will be marked as correct
+
+<b>Using this with Chinese</b>
+
+This plugin will show your results in Pinyin, to make it easier for beginners to see what they got wrong, and whether it was a tone issue or not.
 
 <b>Note on Speech-to-Text Accuracy, especially with Chinese</b>
 
@@ -63,21 +116,6 @@ Now of course, even if you don't say things perfectly, the algorithm tries to fi
 What about for other languages?
 
 Well, Google is certainly not 100% accurate when I do Speech-to-Text for English, but if I speak a bit slow and clearly, I would say it's quite good.
-
-<b>Punctuation</b>
-
-The plugin ignores punctuation when analyzing the card and your speech, so if the card reads:
-"Hello! How are you?"
-You can say "Hello how are you" and it will be correct.
-(You can also say "Hello exclamation mark how are you question mark", and that will work too.)
-
-But one limitation of this is that decimal points are also removed, so if the card reads:
-"3.5"
-You can say "Three point five" or "Thirty-five", and both will be marked as correct
-
-<b>Using this with Chinese</b>
-
-This plugin will show your results in Pinyin, to make it easier for beginners to see what they got wrong, and whether it was a tone issue or not.
 
 <b>Issues / Feedback</b>
 
