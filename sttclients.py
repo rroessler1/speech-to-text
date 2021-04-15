@@ -245,19 +245,19 @@ class MicrosoftClient(STTClient):
             self.select_region_dropdown.addItem(ln)
         self.select_region_dropdown.setCurrentText(
             self.my_settings.value(MicrosoftClient.REGION_SETTING_NAME, '', type=str))
-        select_region_label = QLabel("Region:")
+        select_region_label = QLabel("API Location:")
 
         labels_vl = QVBoxLayout()
         labels_vl.addWidget(select_language_label)
-        labels_vl.addWidget(select_region_label)
         labels_vl.addWidget(field_to_read_setting_label)
         labels_vl.addWidget(api_setting_label)
+        labels_vl.addWidget(select_region_label)
 
         boxes_vl = QVBoxLayout()
         boxes_vl.addWidget(self.select_language_dropdown)
-        boxes_vl.addWidget(self.select_region_dropdown)
         boxes_vl.addWidget(self.field_to_read_textbox)
         boxes_vl.addWidget(self.api_key_textbox)
+        boxes_vl.addWidget(self.select_region_dropdown)
 
         my_settings_layout.addLayout(labels_vl)
         my_settings_layout.addLayout(boxes_vl)
