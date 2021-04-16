@@ -8,7 +8,7 @@ It currently supports Google and Microsoft Cloud Speech-to-Text services.
 
 <b>HOW TO USE</b>
 
-You need either a Google or Microsoft API key. Here are instructions for both:
+You need either a Google or Microsoft API key, which may cost money, but Microsoft has a very generous free tier. Here are instructions for both:
 
 <b>Google</b>
 
@@ -68,21 +68,22 @@ Please note this is the price charged by Google and Microsoft to use their Cloud
 
 The current pricing details are here: <a href="https://cloud.google.com/speech-to-text/pricing" rel="nofollow">https://cloud.google.com/speech-to-text/pricing</a>
 
-The first 60 minutes per month are free, and then it's $0.004 or $0.006 USD per 15 seconds, depending on if you enable data logging.
+The first 60 minutes per month are free, and then it's $0.004 or $0.006 USD per 15 seconds (rounded up at 15 second increments), depending on if you enable data logging.
 
 If you test your pronunciation on 100 cards every day (and each audio clip is 15 seconds or less), then it will cost you:
 (3000 cards per month - 240 (free tier)) * $0.006 = $16.56 USD / month.  Or $11.04 if you enable data logging.
 
 <b>Microsoft</b>
 
-Pricing details are here: https://azure.microsoft.com/en-us/pricing/details/cognitive-services/speech-services/ but are unclear
+Pricing details are here: https://azure.microsoft.com/en-us/pricing/details/cognitive-services/speech-services/
 
-On the Free Tier, you get 5 free hours of audio. Presumably, if you use more than this, it costs $1 per hour, which is what the standard tier costs.
+On the Free Tier, you get 5 free hours of audio. If you use more than this, you have to manually upgrade to the standard tier, which costs $1 per hour.
 
-If you test your pronunciation on 100 cards every day, and the average clip length is 6 seconds, then it will cost you:
-30 days * 100 cards * 6 seconds / 3600 seconds in an hour = 5 hours = <b>Free</b>
+If you test your pronunciation on 100 cards every day, and the average clip length is 6 seconds, then it will be <b>Free</b>.
 
 If the average clip length is 15 seconds, it will cost you $7.50 USD per month.
+
+30 days * 100 cards * 15 seconds / 3600 seconds in an hour = 12.5 hours - 5 free hours = $7.50 USD
 
 <b>Punctuation</b>
 
