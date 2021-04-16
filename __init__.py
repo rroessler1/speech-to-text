@@ -148,7 +148,8 @@ def to_pinyin(sent):
 
 
 def remove_html(s):
-    return re.sub(REMOVE_HTML_RE, '', s)
+    no_html = re.sub(REMOVE_HTML_RE, '', s)
+    return no_html.replace("&nbsp;", "")
 
 
 # One disadvantage of doing it this way is that the output will look less correct (such as "dont" and "crosscountry").
