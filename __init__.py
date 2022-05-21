@@ -47,7 +47,10 @@ def test_pronunciation():
         return
 
     # Make sure that the field on the card exists
-    field_to_read = stt_client.get_field_to_read()
+    field_to_read = next(
+        iter([tag.partition("stt::field::")[2] for tag in mw.reviewer.card._note.tags if "stt::field::" in tag]),
+        stt_client.get_field_to_read()
+    )
     if field_to_read not in mw.reviewer.card.note():
         show_error_dialog(f'This plugin needs to know which field you are reading. '
                                  f'It\'s looking for a field named: "{field_to_read}", '
@@ -73,7 +76,10 @@ def test_pronunciation():
         try:
             tts_result = stt_client.get_stt_results(recorded_voice)
             tts_result = strip_all_punc(tts_result).strip()
-            diff_and_show_result(to_read_text, tts_result, stt_client.get_language_code())
+            diff_and_show_result(to_read_text, tts_result, next(
+                iter([tag.partition("stt::language::")[2] for tag in mw.reviewer.card._note.tags if "stt::language::" in tag]),
+                stt_client.get_language_code()
+            ))
         except STTError as e:
             show_error_dialog(str(e), e.show_settings)
             return
