@@ -47,7 +47,11 @@ def test_pronunciation():
         return
 
     # Make sure that the field on the card exists
-    field_to_read = stt_client.get_field_to_read()
+    #field_to_read = stt_client.get_field_to_read()
+    field_to_read = next(
+        iter([tag.partition("stt::field::")[2] for tag in mw.reviewer.card._note.tags if "stt::field::" in tag]),
+        stt_client.get_field_to_read()
+    )
     if field_to_read not in mw.reviewer.card.note():
         show_error_dialog(f'This plugin needs to know which field you are reading. '
                                  f'It\'s looking for a field named: "{field_to_read}", '
@@ -210,9 +214,11 @@ class SettingsDialog(QDialog):
 
         self.base_layout = QVBoxLayout()
         self.service_combo_box = QComboBox()
-        self.service_names = ["Google Cloud", "Microsoft Azure"]
+        #self.service_names = ["Google Cloud", "Microsoft Azure"]
+        self.service_names = ["Google Cloud", "Microsoft Azure", "SpeechRecognition"]
         self.service_combo_box.addItems(self.service_names)
-        self.service_list = ["google", "microsoft"]
+        #self.service_list = ["google", "microsoft"]
+        self.service_list = ["google", "microsoft", "speechrecognition"]
         self.services = []
         self.service_combo_box.activated.connect(self.toggle_service)
 

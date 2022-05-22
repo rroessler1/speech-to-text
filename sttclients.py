@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import base64
 import requests
+from ._vendor import speech_recognition as sr #import aifc #https://docs.python.org/3/library/aifc.html #https://peps.python.org/pep-0594/#aifc
 
 # import all of the Qt GUI library
 from aqt.qt import *
@@ -9,10 +10,19 @@ from .exceptions import STTError
 
 
 def get_stt_client(name, settings: QSettings):
+#    if name == "apiai": #iOS
+#        return apiaiClient(settings)
+#    if name == "assemblyai":
+#        return AssemblyAIClient(settings)
     if name == "google":
         return GoogleClient(settings)
     if name == "microsoft":
         return MicrosoftClient(settings)
+    if name == "speechrecognition": # https://pypi.org/project/SpeechRecognition/
+        return SRClient(settings)
+#    if name == "ibm-watsom": #previously "watson-developer-cloud"
+#        return WatsonClient(settings)
+#    else https://realpython.com/python-speech-recognition/
     raise Exception("Invalid STT client name")
 
 
@@ -50,6 +60,176 @@ class STTClient(ABC):
         pass
 
 
+class SRClient(STTClient):
+    # Constants
+    #API_KEY_SETTING_NAME1 = "sr-bing-key"
+    ##API_KEY_SETTING_NAME2 = "sr-google-key"
+    ##API_KEY_SETTING_NAME3 = "sr-google-cloud-key"
+    #API_KEY_SETTING_NAME4 = "sr-houndify-client-id"
+    #API_KEY_SETTING_NAME4b = "sr-houndify-client-key"
+    #API_KEY_SETTING_NAME5 = "sr-ibm-username"
+    #API_KEY_SETTING_NAME5b = "sr-ibm-password"
+    #API_KEY_SETTING_NAME6 = "sr-sphinx-key"
+    #API_KEY_SETTING_NAME7 = "sr-wit-key"
+    API_KEY_SETTING_NAME = "sr-key"
+    API_KEY_SETTING_NAME2 = "sr-key2"
+    RECOGNIZER_SETTING_NAME = "sr-recognizer"
+    RECOGNIZER_DEFAULT_NAME = "bing"
+    RECOGNIZERS = ["bing", "google", "google_cloud", "houndify", "ibm", "sphinx", "wit"]
+    RECOGNIZER_NAMES = ["Microsoft Bing Speech", "Google Web Speech API", "Google Cloud Speech", "Houndify", "IBM Speech to Text", "CMU Sphinx", "Wit.ai"]
+    FIELD_TO_READ_SETTING_NAME = "field-to-read"
+    FIELD_TO_READ_DEFAULT_NAME = "Front"
+    LANGUAGE_SETTING_NAME = "language-name"
+
+    def __init__(self, settings: QSettings):
+        self.my_settings = settings
+        self.r = sr.Recognizer()
+
+        # Settings that we need to read later
+        self.api_key_textbox = QLineEdit()
+        self.api_key_textbox2 = QLineEdit()
+        self.field_to_read_textbox = QLineEdit()
+        self.select_recognizer_dropdown = QComboBox()
+        self.select_language_dropdown = QComboBox()
+
+    def get_field_to_read(self):
+        return self.my_settings.value(GoogleClient.FIELD_TO_READ_SETTING_NAME, GoogleClient.FIELD_TO_READ_DEFAULT_NAME, type=str) #FIXME
+
+    def get_language_code(self):
+        return next(
+            iter([tag.partition("stt::language::")[2] for tag in mw.reviewer.card._note.tags if "stt::language::" in tag]),
+            "en-US" #FIXME
+        )
+
+    def pre_stt_validate(self):
+        #alert("pre_stt_validate") #FIXME
+        """
+            Does any required validation before recording audio.
+            Specifically, it currently validates the API key is not empty.
+            Throws an exception if validation fails.
+        """
+        pass
+
+    def get_stt_results(self, audio_file_path):
+        #alert("get_stt_results") #FIXME
+        """
+            Call pre_stt_validate first, then call this.
+        """
+        
+        # "Microsoft Bing Speech" → "bing" → r.recognize_bing()
+        name = SRClient.RECOGNIZERS[SRClient.RECOGNIZER_NAMES.index(
+            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str))]
+        recdotwav = sr.AudioFile(audio_file_path)
+        with recdotwav as source:
+            audio = self.r.record(source)
+        #getattr(self.r,"recognize_"+name)(audio)
+        #recognize_name(audio)
+        #recognize_name(audio, key)
+        #recognize_name(audio, username, password)
+        #recognize_name(audio, client_id, client_key)
+        if name in ["google", "google-cloud", "sphinx"]:
+            getattr(self.r,"recognize_"+name)(audio)
+        elif name in ["bing", "wit"]:
+            getattr(self.r,"recognize_"+name)(audio, 
+                self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str))
+        elif name in ["houndify", "ibm"]:
+            getattr(self.r,"recognize_"+name)(audio, 
+                self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str), 
+                self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str))
+
+    def get_my_settings_layout(self):
+        my_settings_layout = QHBoxLayout()
+
+        #self.api_key_textbox1.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME1, "", type=str))
+        ##self.api_key_textbox2.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str))
+        ##self.api_key_textbox3.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME3, "", type=str))
+        #self.api_key_textbox4.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME4, "", type=str))
+        #self.api_key_textbox4b.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME4b, "", type=str))
+        #self.api_key_textbox5.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME5, "", type=str))
+        #self.api_key_textbox5b.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME5b, "", type=str))
+        #self.api_key_textbox6.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME6, "", type=str))
+        #self.api_key_textbox7.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME7, "", type=str))
+        self.api_key_textbox.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str))
+        self.api_key_textbox2.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str))
+        #api_setting_label1 = QLabel("Bing Key:")
+        ##api_setting_label2 = QLabel("Google Key:")
+        ##api_setting_label3 = QLabel("Google Cloud Key:")
+        #api_setting_label4 = QLabel("Houndify Client ID:")
+        #api_setting_label4b = QLabel("Houndify Client Key:")
+        #api_setting_label5 = QLabel("IBM Username:")
+        #api_setting_label5b = QLabel("IBM Password:")
+        #api_setting_label6 = QLabel("Sphinx Key:")
+        #api_setting_label7 = QLabel("Wit Key:")
+        api_setting_label = QLabel("Key/Client ID/Username:")
+        api_setting_label2 = QLabel("Client Key/Password:")
+
+        self.field_to_read_textbox.setText(self.my_settings.value(SRClient.FIELD_TO_READ_SETTING_NAME, SRClient.FIELD_TO_READ_DEFAULT_NAME, type=str))
+        field_to_read_setting_label = QLabel("Name of Card Field to Read:")
+
+        for ln in SRClient.RECOGNIZER_NAMES:
+            self.select_recognizer_dropdown.addItem(ln)
+        self.select_recognizer_dropdown.setCurrentText(self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, '', type=str))
+        select_recognizer_label = QLabel("Recognizer:")
+
+        for ln in GoogleClient.SUPPORTED_LANGUAGE_NAMES:
+            self.select_language_dropdown.addItem(ln)
+        self.select_language_dropdown.setCurrentText(self.my_settings.value(SRClient.LANGUAGE_SETTING_NAME, '', type=str))
+        select_language_label = QLabel("Language:")
+
+        labels_vl = QVBoxLayout()
+        labels_vl.addWidget(select_recognizer_label)
+        labels_vl.addWidget(select_language_label)
+        labels_vl.addWidget(field_to_read_setting_label)
+        #labels_vl.addWidget(api_setting_label1)
+        ##labels_vl.addWidget(api_setting_label2)
+        ##labels_vl.addWidget(api_setting_label3)
+        #labels_vl.addWidget(api_setting_label4)
+        #labels_vl.addWidget(api_setting_label4b)
+        #labels_vl.addWidget(api_setting_label5)
+        #labels_vl.addWidget(api_setting_label5b)
+        #labels_vl.addWidget(api_setting_label6)
+        #labels_vl.addWidget(api_setting_label7)
+        labels_vl.addWidget(api_setting_label)
+        labels_vl.addWidget(api_setting_label2)
+
+        boxes_vl = QVBoxLayout()
+        boxes_vl.addWidget(self.select_recognizer_dropdown)
+        boxes_vl.addWidget(self.select_language_dropdown)
+        boxes_vl.addWidget(self.field_to_read_textbox)
+        #boxes_vl.addWidget(self.api_key_textbox1)
+        ##boxes_vl.addWidget(self.api_key_textbox2)
+        ##boxes_vl.addWidget(self.api_key_textbox3)
+        #boxes_vl.addWidget(self.api_key_textbox4)
+        #boxes_vl.addWidget(self.api_key_textbox4b)
+        #boxes_vl.addWidget(self.api_key_textbox5)
+        #boxes_vl.addWidget(self.api_key_textbox5b)
+        #boxes_vl.addWidget(self.api_key_textbox6)
+        #boxes_vl.addWidget(self.api_key_textbox7)
+        boxes_vl.addWidget(self.api_key_textbox)
+        boxes_vl.addWidget(self.api_key_textbox2)
+
+        my_settings_layout.addLayout(labels_vl)
+        my_settings_layout.addLayout(boxes_vl)
+
+        return my_settings_layout
+
+    def save_settings(self):
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME1, self.api_key_textbox1.text())
+        ##self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME2, self.api_key_textbox2.text())
+        ##self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME3, self.api_key_textbox3.text())
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME4, self.api_key_textbox4.text())
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME4b, self.api_key_textbox4b.text())
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME5, self.api_key_textbox5.text())
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME5b, self.api_key_textbox5b.text())
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME6, self.api_key_textbox6.text())
+        #self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME7, self.api_key_textbox7.text())
+        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME, self.api_key_textbox.text())
+        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME2, self.api_key_textbox2.text())
+        self.my_settings.setValue(SRClient.FIELD_TO_READ_SETTING_NAME, self.field_to_read_textbox.text())
+        self.my_settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, self.select_recognizer_dropdown.currentText())
+        self.my_settings.setValue(SRClient.LANGUAGE_SETTING_NAME, self.select_language_dropdown.currentText())
+
+
 class GoogleClient(STTClient):
     # Constants
     API_KEY_SETTING_NAME = "google-stt-api-key"
@@ -71,8 +251,11 @@ class GoogleClient(STTClient):
         return self.my_settings.value(GoogleClient.FIELD_TO_READ_SETTING_NAME, GoogleClient.FIELD_TO_READ_DEFAULT_NAME, type=str)
 
     def get_language_code(self):
-        return GoogleClient.SUPPORTED_LANGUAGE_CODES[GoogleClient.SUPPORTED_LANGUAGE_NAMES.index(
-            self.my_settings.value(GoogleClient.LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
+        return next(
+            iter([tag.partition("stt::language::")[2] for tag in mw.reviewer.card._note.tags if "stt::language::" in tag]),
+            GoogleClient.SUPPORTED_LANGUAGE_CODES[GoogleClient.SUPPORTED_LANGUAGE_NAMES.index(
+                self.my_settings.value(GoogleClient.LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
+        )
 
     def get_api_key(self):
         return self.my_settings.value(GoogleClient.API_KEY_SETTING_NAME, "", type=str)
@@ -178,8 +361,11 @@ class MicrosoftClient(STTClient):
         return self.my_settings.value(MicrosoftClient.FIELD_TO_READ_SETTING_NAME, MicrosoftClient.FIELD_TO_READ_DEFAULT_NAME, type=str)
 
     def get_language_code(self):
-        return MicrosoftClient.SUPPORTED_LANGUAGE_CODES[MicrosoftClient.SUPPORTED_LANGUAGE_NAMES.index(
-            self.my_settings.value(MicrosoftClient.LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
+        return next(
+            iter([tag.partition("stt::language::")[2] for tag in mw.reviewer.card._note.tags if "stt::language::" in tag]),
+            MicrosoftClient.SUPPORTED_LANGUAGE_CODES[MicrosoftClient.SUPPORTED_LANGUAGE_NAMES.index(
+                self.my_settings.value(MicrosoftClient.LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
+        )
 
     def get_api_key(self):
         return self.my_settings.value(MicrosoftClient.API_KEY_SETTING_NAME, "", type=str)
