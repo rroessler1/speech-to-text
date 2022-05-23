@@ -7,7 +7,7 @@ import os
 import sys
 import subprocess
 import wave
-#import aifc #https://docs.python.org/3/library/aifc.html #https://peps.python.org/pep-0594/#aifc
+import aifc
 import math
 import audioop
 import collections
@@ -725,7 +725,6 @@ class Recognizer(AudioSource):
         assert keyword_entries is None or all(isinstance(keyword, (type(""), type(u""))) and 0 <= sensitivity <= 1 for keyword, sensitivity in keyword_entries), "``keyword_entries`` must be ``None`` or a list of pairs of strings and numbers between 0 and 1"
 
         # import the PocketSphinx speech recognition module
-        from pocketsphinx import pocketsphinx, Jsgf, FsgModel #debug: give me the error now
         try:
             from pocketsphinx import pocketsphinx, Jsgf, FsgModel
 
