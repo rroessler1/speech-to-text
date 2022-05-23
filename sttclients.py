@@ -205,25 +205,25 @@ class SRClient(STTClient):
 #        name = SRClient.RECOGNIZERS[SRClient.RECOGNIZER_NAMES.index(
 #            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str))]
         #case = self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
-        case = next(
+        case = name = next(
             iter([tag.partition("stt::service::sr-")[2] for tag in mw.reviewer.card._note.tags if "stt::service::sr-" in tag]),
             self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
         )
-        key = self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str)
-        key2 = self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str)
+        key = username = client_id = client_access_token = credentials_json = self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str)
+        key2 = password = client_key = session_id = self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str)
         l = self.get_language_code()
         recdotwav = sr.AudioFile(audio_file_path)
         with recdotwav as source:
             audio = self.r.record(source)
         #switch name:
-        if case=="google":	return self.r.recognize_google(	audio, language=l)
-        if case=="google_cloud":	return self.r.recognize_google_cloud(	audio, language=l)
-        if case=="sphinx":	return self.r.recognize_sphinx(	audio, language=l)
-        if case=="wit":	return self.r.recognize_wit(	audio, key)
-        if case=="bing":	return self.r.recognize_bing(	audio, key, language=l)
-        if case=="houndify":	return self.r.recognize_houndify(	audio, key, key2)
-        if case=="ibm":	return self.r.recognize_ibm(	audio, key, key2, language=l)
-        return "self.r.recognize_"+case+"(audio, key, key2, language="+l+")"
+        if case=="api":	return self.r.recognize_api(	audio, client_access_token, language=l, session_id=session_id) #show_all
+        if case=="bing":	return self.r.recognize_bing(	audio, key, language=l) #show_all
+        if case=="google":	return self.r.recognize_google(	audio, key, language=l) #show_all
+        if case=="google_cloud":	return self.r.recognize_google_cloud(	audio, credentials_json=credentials_json, language=l) #preferred_phrases, show_all
+        if case=="houndify":	return self.r.recognize_houndify(	audio, client_id, client_key) #show_all
+        if case=="ibm":	return self.r.recognize_ibm(	audio, username, password, language=l) #show_all
+        if case=="sphinx":	return self.r.recognize_sphinx(	audio, language=l) #keyword_entries, grammar, show_all
+        if case=="wit":	return self.r.recognize_wit(	audio, key) #show_all
 
     def get_my_settings_layout(self):
         my_settings_layout = QHBoxLayout()
