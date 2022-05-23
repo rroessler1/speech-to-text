@@ -131,13 +131,13 @@ class SRClient(STTClient):
         #recognize_name(audio, username, password)
         #recognize_name(audio, client_id, client_key)
         if name in ["google", "google-cloud", "sphinx"]:
-            getattr(self.r,"recognize_"+name)(audio, language=self.get_language_code())
+            return getattr(self.r,"recognize_"+name)(audio, language=self.get_language_code())
         elif name in ["bing", "wit"]:
-            getattr(self.r,"recognize_"+name)(audio, 
+            return getattr(self.r,"recognize_"+name)(audio, 
                 self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str), 
                 language=self.get_language_code())
         elif name in ["houndify", "ibm"]:
-            getattr(self.r,"recognize_"+name)(audio, 
+            return getattr(self.r,"recognize_"+name)(audio, 
                 self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str), 
                 self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str), 
                 language=self.get_language_code())
