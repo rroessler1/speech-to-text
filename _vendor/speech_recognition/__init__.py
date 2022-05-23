@@ -725,6 +725,7 @@ class Recognizer(AudioSource):
         assert keyword_entries is None or all(isinstance(keyword, (type(""), type(u""))) and 0 <= sensitivity <= 1 for keyword, sensitivity in keyword_entries), "``keyword_entries`` must be ``None`` or a list of pairs of strings and numbers between 0 and 1"
 
         # import the PocketSphinx speech recognition module
+        from pocketsphinx import pocketsphinx, Jsgf, FsgModel #debug: give me the error now
         try:
             from pocketsphinx import pocketsphinx, Jsgf, FsgModel
 

@@ -10,6 +10,10 @@ from aqt.utils import showInfo
 from aqt.qt import *
 from aqt.sound import record_audio
 
+addon_dir = os.path.dirname(os.path.realpath(__file__))
+vendor_dir = os.path.join(addon_dir, "_vendor")
+sys.path.append(vendor_dir)
+
 from ._vendor.dragonmapper import hanzi
 from .exceptions import STTError
 from . import sttclients
