@@ -218,11 +218,9 @@ class SettingsDialog(QDialog):
 
         self.base_layout = QVBoxLayout()
         self.service_combo_box = QComboBox()
-        #self.service_names = ["Google Cloud", "Microsoft Azure"]
-        self.service_names = ["Google Cloud", "Microsoft Azure", "SpeechRecognition"]
+        self.service_names = ["AssemblyAI", "Google Cloud", "Microsoft Azure", "SpeechRecognition"]
         self.service_combo_box.addItems(self.service_names)
-        #self.service_list = ["google", "microsoft"]
-        self.service_list = ["google", "microsoft", "speechrecognition"]
+        self.service_list = ["assemblyai", "google", "microsoft", "speechrecognition"]
         self.services = []
         self.service_combo_box.activated.connect(self.toggle_service)
 

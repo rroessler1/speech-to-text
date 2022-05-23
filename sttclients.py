@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import base64
 import requests
 from ._vendor import speech_recognition as sr #import aifc #https://docs.python.org/3/library/aifc.html #https://peps.python.org/pep-0594/#aifc
+from ._vendor import assemblyai
 
 # import the main window object (mw) from aqt
 from aqt import mw
@@ -14,8 +15,8 @@ from .exceptions import STTError
 def get_stt_client(name, settings: QSettings):
 #    if name == "apiai": #iOS
 #        return apiaiClient(settings)
-#    if name == "assemblyai":
-#        return AssemblyAIClient(settings)
+    if name == "assemblyai":
+        return AssemblyAIClient(settings)
     if name == "google":
         return GoogleClient(settings)
     if name == "microsoft":
@@ -60,6 +61,86 @@ class STTClient(ABC):
     @abstractmethod
     def save_settings(self):
         pass
+
+
+class AssemblyAIClient(STTClient):
+    # Constants
+    API_KEY_SETTING_NAME = "assemblyai-key"
+    FIELD_TO_READ_SETTING_NAME = "field-to-read"
+    FIELD_TO_READ_DEFAULT_NAME = "Front"
+    LANGUAGE_SETTING_NAME = "language-name"
+
+    def __init__(self, settings: QSettings):
+        self.my_settings = settings
+
+        # Settings that we need to read later
+        self.api_key_textbox = QLineEdit()
+        self.field_to_read_textbox = QLineEdit()
+        self.select_language_dropdown = QComboBox()
+
+    def get_field_to_read(self):
+        return self.my_settings.value(AssemblyAIClient.FIELD_TO_READ_SETTING_NAME, AssemblyAIClient.FIELD_TO_READ_DEFAULT_NAME, type=str)
+
+    def get_language_code(self):
+        return next(
+            iter([tag.partition("stt::language::")[2] for tag in mw.reviewer.card._note.tags if "stt::language::" in tag]),
+            GoogleClient.SUPPORTED_LANGUAGE_CODES[GoogleClient.SUPPORTED_LANGUAGE_NAMES.index(
+                self.my_settings.value(AssemblyAIClient.LANGUAGE_SETTING_NAME, 'English (United States)', type=str))]
+        )
+
+    def pre_stt_validate(self):
+        #alert("pre_stt_validate") #FIXME
+        """
+            Does any required validation before recording audio.
+            Specifically, it currently validates the API key is not empty.
+            Throws an exception if validation fails.
+        """
+        pass
+
+    def get_stt_results(self, audio_file_path):
+        #alert("get_stt_results") #FIXME
+        """
+            Call pre_stt_validate first, then call this.
+        """
+        aai = assemblyai.Client(token=AssemblyAIClient.API_KEY_SETTING_NAME)
+        transcript = aai.transcribe(filename=audio_file_path)
+        while transcript.status != 'completed':
+            transcript = transcript.get()
+        return transcript.text
+
+    def get_my_settings_layout(self):
+        my_settings_layout = QHBoxLayout()
+
+        self.api_key_textbox.setText(self.my_settings.value(AssemblyAIClient.API_KEY_SETTING_NAME, "", type=str))
+        api_setting_label = QLabel("API token:")
+
+        self.field_to_read_textbox.setText(self.my_settings.value(AssemblyAIClient.FIELD_TO_READ_SETTING_NAME, AssemblyAIClient.FIELD_TO_READ_DEFAULT_NAME, type=str))
+        field_to_read_setting_label = QLabel("Name of Card Field to Read:")
+
+        for ln in GoogleClient.SUPPORTED_LANGUAGE_NAMES:
+            self.select_language_dropdown.addItem(ln)
+        self.select_language_dropdown.setCurrentText(self.my_settings.value(AssemblyAIClient.LANGUAGE_SETTING_NAME, '', type=str))
+        select_language_label = QLabel("Language:")
+
+        labels_vl = QVBoxLayout()
+        labels_vl.addWidget(select_language_label)
+        labels_vl.addWidget(field_to_read_setting_label)
+        labels_vl.addWidget(api_setting_label)
+
+        boxes_vl = QVBoxLayout()
+        boxes_vl.addWidget(self.select_language_dropdown)
+        boxes_vl.addWidget(self.field_to_read_textbox)
+        boxes_vl.addWidget(self.api_key_textbox)
+
+        my_settings_layout.addLayout(labels_vl)
+        my_settings_layout.addLayout(boxes_vl)
+
+        return my_settings_layout
+
+    def save_settings(self):
+        self.my_settings.setValue(AssemblyAIClient.API_KEY_SETTING_NAME, self.api_key_textbox.text())
+        self.my_settings.setValue(AssemblyAIClient.FIELD_TO_READ_SETTING_NAME, self.field_to_read_textbox.text())
+        self.my_settings.setValue(AssemblyAIClient.LANGUAGE_SETTING_NAME, self.select_language_dropdown.currentText())
 
 
 class SRClient(STTClient):
@@ -148,7 +229,7 @@ class SRClient(STTClient):
         self.api_key_textbox.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str))
         self.api_key_textbox2.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str))
         api_setting_label = QLabel("Key/Client ID/Username:")
-        api_setting_label2 = QLabel("Client Key/Password:")
+        api_setting_label2 = QLabel("    Client Key/Password:")
 
         self.field_to_read_textbox.setText(self.my_settings.value(SRClient.FIELD_TO_READ_SETTING_NAME, SRClient.FIELD_TO_READ_DEFAULT_NAME, type=str))
         field_to_read_setting_label = QLabel("Name of Card Field to Read:")
