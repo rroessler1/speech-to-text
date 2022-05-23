@@ -21,7 +21,8 @@ def get_stt_client(name, settings: QSettings):
         return GoogleClient(settings)
     if name == "microsoft":
         return MicrosoftClient(settings)
-    if name == "speechrecognition": # https://pypi.org/project/SpeechRecognition/
+    if name.startswith("sr-"): # https://pypi.org/project/SpeechRecognition/
+        settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, name.partition("sr-")[2])
         return SRClient(settings)
 #    if name == "ibm-watsom": #previously "watson-developer-cloud"
 #        return WatsonClient(settings)
@@ -172,7 +173,7 @@ class SRClient(STTClient):
         self.api_key_textbox = QLineEdit()
         self.api_key_textbox2 = QLineEdit()
         self.field_to_read_textbox = QLineEdit()
-        self.select_recognizer_dropdown = QComboBox()
+#        self.select_recognizer_dropdown = QComboBox()
         self.select_language_dropdown = QComboBox()
 
     def get_field_to_read(self):
@@ -201,8 +202,9 @@ class SRClient(STTClient):
         """
         
         # "Microsoft Bing Speech" → "bing" → r.recognize_bing()
-        name = SRClient.RECOGNIZERS[SRClient.RECOGNIZER_NAMES.index(
-            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str))]
+#        name = SRClient.RECOGNIZERS[SRClient.RECOGNIZER_NAMES.index(
+#            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str))]
+        name = self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
         recdotwav = sr.AudioFile(audio_file_path)
         with recdotwav as source:
             audio = self.r.record(source)
@@ -234,10 +236,10 @@ class SRClient(STTClient):
         self.field_to_read_textbox.setText(self.my_settings.value(SRClient.FIELD_TO_READ_SETTING_NAME, SRClient.FIELD_TO_READ_DEFAULT_NAME, type=str))
         field_to_read_setting_label = QLabel("Name of Card Field to Read:")
 
-        for ln in SRClient.RECOGNIZER_NAMES:
-            self.select_recognizer_dropdown.addItem(ln)
-        self.select_recognizer_dropdown.setCurrentText(self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, '', type=str))
-        select_recognizer_label = QLabel("Recognizer:")
+#        for ln in SRClient.RECOGNIZER_NAMES:
+#            self.select_recognizer_dropdown.addItem(ln)
+#        self.select_recognizer_dropdown.setCurrentText(self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, '', type=str))
+#        select_recognizer_label = QLabel("Recognizer:")
 
         for ln in GoogleClient.SUPPORTED_LANGUAGE_NAMES:
             self.select_language_dropdown.addItem(ln)
@@ -245,14 +247,14 @@ class SRClient(STTClient):
         select_language_label = QLabel("Language:")
 
         labels_vl = QVBoxLayout()
-        labels_vl.addWidget(select_recognizer_label)
+#        labels_vl.addWidget(select_recognizer_label)
         labels_vl.addWidget(select_language_label)
         labels_vl.addWidget(field_to_read_setting_label)
         labels_vl.addWidget(api_setting_label)
         labels_vl.addWidget(api_setting_label2)
 
         boxes_vl = QVBoxLayout()
-        boxes_vl.addWidget(self.select_recognizer_dropdown)
+#        boxes_vl.addWidget(self.select_recognizer_dropdown)
         boxes_vl.addWidget(self.select_language_dropdown)
         boxes_vl.addWidget(self.field_to_read_textbox)
         boxes_vl.addWidget(self.api_key_textbox)
@@ -267,7 +269,7 @@ class SRClient(STTClient):
         self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME, self.api_key_textbox.text())
         self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME2, self.api_key_textbox2.text())
         self.my_settings.setValue(SRClient.FIELD_TO_READ_SETTING_NAME, self.field_to_read_textbox.text())
-        self.my_settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, self.select_recognizer_dropdown.currentText())
+#        self.my_settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, self.select_recognizer_dropdown.currentText())
         self.my_settings.setValue(SRClient.LANGUAGE_SETTING_NAME, self.select_language_dropdown.currentText())
 
 
