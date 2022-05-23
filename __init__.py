@@ -43,6 +43,9 @@ def settings_dialog():
 
 
 def test_pronunciation():
+    #maybe change stt_client by tags NOW
+    stt_provider.update_from_settings()
+
     stt_client = stt_provider.stt_client
 
     # If they're not in study mode, use this as a shortcut to open settings
@@ -195,7 +198,15 @@ class STTProvider:
         self.update_from_settings()
 
     def update_from_settings(self):
-        self.stt_client_name = self.settings.value(STT_CLIENT_SETTING_NAME, STT_CLIENT_DEFAULT_NAME, type=str)
+        try:
+            #maybe change stt_client by tags
+            self.stt_client_name = next(
+                iter([tag.partition("stt::service::")[2] for tag in mw.reviewer.card._note.tags if "stt::service::" in tag]),
+                self.settings.value(STT_CLIENT_SETTING_NAME, STT_CLIENT_DEFAULT_NAME, type=str)
+            )
+        except AttributeError as e:
+            #not at a card
+            self.stt_client_name = self.settings.value(STT_CLIENT_SETTING_NAME, STT_CLIENT_DEFAULT_NAME, type=str)
         self.stt_client = sttclients.get_stt_client(self.stt_client_name, self.settings)
 
     def get_stt_client_name(self):

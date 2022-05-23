@@ -22,7 +22,7 @@ def get_stt_client(name, settings: QSettings):
     if name == "microsoft":
         return MicrosoftClient(settings)
     if name.startswith("sr-"): # https://pypi.org/project/SpeechRecognition/
-        settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, name.partition("sr-")[2])
+        settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, name.partition("sr-")[2]) #redundant line
         return SRClient(settings)
 #    if name == "ibm-watsom": #previously "watson-developer-cloud"
 #        return WatsonClient(settings)
@@ -204,26 +204,26 @@ class SRClient(STTClient):
         # "Microsoft Bing Speech" → "bing" → r.recognize_bing()
 #        name = SRClient.RECOGNIZERS[SRClient.RECOGNIZER_NAMES.index(
 #            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str))]
-        name = self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        #case = self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        case = next(
+            iter([tag.partition("stt::service::sr-")[2] for tag in mw.reviewer.card._note.tags if "stt::service::sr-" in tag]),
+            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        )
+        key = self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str)
+        key2 = self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str)
+        l = self.get_language_code()
         recdotwav = sr.AudioFile(audio_file_path)
         with recdotwav as source:
             audio = self.r.record(source)
-        #getattr(self.r,"recognize_"+name)(audio)
-        #recognize_name(audio)
-        #recognize_name(audio, key)
-        #recognize_name(audio, username, password)
-        #recognize_name(audio, client_id, client_key)
-        if name in ["google", "google-cloud", "sphinx"]:
-            return getattr(self.r,"recognize_"+name)(audio, language=self.get_language_code())
-        elif name in ["bing", "wit"]:
-            return getattr(self.r,"recognize_"+name)(audio, 
-                self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str), 
-                language=self.get_language_code())
-        elif name in ["houndify", "ibm"]:
-            return getattr(self.r,"recognize_"+name)(audio, 
-                self.my_settings.value(SRClient.API_KEY_SETTING_NAME, "", type=str), 
-                self.my_settings.value(SRClient.API_KEY_SETTING_NAME2, "", type=str), 
-                language=self.get_language_code())
+        #switch name:
+        if case=="google":	return self.r.recognize_google(	audio, language=l)
+        if case=="google_cloud":	return self.r.recognize_google_cloud(	audio, language=l)
+        if case=="sphinx":	return self.r.recognize_sphinx(	audio, language=l)
+        if case=="wit":	return self.r.recognize_wit(	audio, key)
+        if case=="bing":	return self.r.recognize_bing(	audio, key, language=l)
+        if case=="houndify":	return self.r.recognize_houndify(	audio, key, key2)
+        if case=="ibm":	return self.r.recognize_ibm(	audio, key, key2, language=l)
+        return "self.r.recognize_"+case+"(audio, key, key2, language="+l+")"
 
     def get_my_settings_layout(self):
         my_settings_layout = QHBoxLayout()
