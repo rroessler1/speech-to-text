@@ -344,19 +344,19 @@ class SRClient(STTClient):
         self.api_key_textbox08.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME08, "", type=str))
         self.api_key_textbox09.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME09, "", type=str))
         self.api_key_textbox10.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox11.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox12.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox13.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox14.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox15.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox16.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox17.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox18.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox19.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox20.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox21.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox22.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
-        self.api_key_textbox23.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str))
+        self.api_key_textbox11.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME11, "", type=str))
+        self.api_key_textbox12.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME12, "", type=str))
+        self.api_key_textbox13.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME13, "", type=str))
+        self.api_key_textbox14.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME14, "", type=str))
+        self.api_key_textbox15.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME15, "", type=str))
+        self.api_key_textbox16.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME16, "", type=str))
+        self.api_key_textbox17.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME17, "", type=str))
+        self.api_key_textbox18.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME18, "", type=str))
+        self.api_key_textbox19.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME19, "", type=str))
+        self.api_key_textbox20.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME20, "", type=str))
+        self.api_key_textbox21.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME21, "", type=str))
+        self.api_key_textbox22.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME22, "", type=str))
+        self.api_key_textbox23.setText(self.my_settings.value(SRClient.API_KEY_SETTING_NAME23, "", type=str))
         api_setting_label01 = QLabel("API client access token:") #name05
         api_setting_label02 = QLabel("API session id:")
         api_setting_label03 = QLabel("Bing key:")
@@ -369,17 +369,17 @@ class SRClient(STTClient):
         api_setting_label10 = QLabel("Wit key:")
         api_setting_label11 = QLabel("Azure key:")
         api_setting_label12 = QLabel("Azure location:")
-        api_setting_label13 = QLabel("Lex bot_name:")
-        api_setting_label14 = QLabel("Lex bot_alias:")
-        api_setting_label15 = QLabel("Lex user_id:")
-        api_setting_label16 = QLabel("Lex access_key_id:")
-        api_setting_label17 = QLabel("Lex secret_access_key:")
-        api_setting_label18 = QLabel("Transcribe bucket_name:")
-        api_setting_label19 = QLabel("Transcribe access_key_id:")
-        api_setting_label20 = QLabel("Transcribe secret_access_key:")
-        api_setting_label21 = QLabel("Transcribe region:")
-        api_setting_label22 = QLabel("Transcribe job_name:")
-        api_setting_label23 = QLabel("Transcribe file_key:")
+        api_setting_label13 = QLabel("Amazon Lex bot_name:")
+        api_setting_label14 = QLabel("Amazon Lex bot_alias:")
+        api_setting_label15 = QLabel("Amazon Lex user_id:")
+        api_setting_label16 = QLabel("Amazon Lex access_key_id:")
+        api_setting_label17 = QLabel("Amazon Lex secret_access_key:")
+        api_setting_label18 = QLabel("Amazon Transcribe bucket_name:")
+        api_setting_label19 = QLabel("Amazon Transcribe access_key_id:")
+        api_setting_label20 = QLabel("Amazon Transcribe secret_access_key:")
+        api_setting_label21 = QLabel("Amazon Transcribe region:")
+        api_setting_label22 = QLabel("Amazon Transcribe job_name:")
+        api_setting_label23 = QLabel("Amazon Transcribe file_key:")
 
         self.field_to_read_textbox.setText(self.my_settings.value(SRClient.FIELD_TO_READ_SETTING_NAME, SRClient.FIELD_TO_READ_DEFAULT_NAME, type=str))
         field_to_read_setting_label = QLabel("Name of Card Field to Read:")
@@ -398,57 +398,84 @@ class SRClient(STTClient):
 #        labels_vl.addWidget(select_recognizer_label)
         labels_vl.addWidget(select_language_label)
         labels_vl.addWidget(field_to_read_setting_label)
-        labels_vl.addWidget(api_setting_label01) #name06
-        labels_vl.addWidget(api_setting_label02)
-        labels_vl.addWidget(api_setting_label03)
-        labels_vl.addWidget(api_setting_label04)
-        labels_vl.addWidget(api_setting_label05)
-        labels_vl.addWidget(api_setting_label06)
-        labels_vl.addWidget(api_setting_label07)
-        labels_vl.addWidget(api_setting_label08)
-        labels_vl.addWidget(api_setting_label09)
-        labels_vl.addWidget(api_setting_label10)
-        labels_vl.addWidget(api_setting_label11)
-        labels_vl.addWidget(api_setting_label12)
-        labels_vl.addWidget(api_setting_label13)
-        labels_vl.addWidget(api_setting_label14)
-        labels_vl.addWidget(api_setting_label15)
-        labels_vl.addWidget(api_setting_label16)
-        labels_vl.addWidget(api_setting_label17)
-        labels_vl.addWidget(api_setting_label18)
-        labels_vl.addWidget(api_setting_label19)
-        labels_vl.addWidget(api_setting_label20)
-        labels_vl.addWidget(api_setting_label21)
-        labels_vl.addWidget(api_setting_label22)
-        labels_vl.addWidget(api_setting_label23)
+        case = name = self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        if case=="api":
+            labels_vl.addWidget(api_setting_label01) #name06
+            labels_vl.addWidget(api_setting_label02)
+        if case=="bing":
+            labels_vl.addWidget(api_setting_label03)
+        if case=="google":
+            labels_vl.addWidget(api_setting_label04)
+        if case=="google_cloud":
+            labels_vl.addWidget(api_setting_label05)
+        if case=="houndify":
+            labels_vl.addWidget(api_setting_label06)
+            labels_vl.addWidget(api_setting_label07)
+        if case=="ibm":
+            labels_vl.addWidget(api_setting_label08)
+            labels_vl.addWidget(api_setting_label09)
+        #if case=="sphinx":
+        if case=="wit":
+            labels_vl.addWidget(api_setting_label10)
+        if case=="azure":
+            labels_vl.addWidget(api_setting_label11)
+            labels_vl.addWidget(api_setting_label12)
+        if case=="amazon-lex":
+            labels_vl.addWidget(api_setting_label13)
+            labels_vl.addWidget(api_setting_label14)
+            labels_vl.addWidget(api_setting_label15)
+            labels_vl.addWidget(api_setting_label16)
+            labels_vl.addWidget(api_setting_label17)
+        if case=="amazon":
+            labels_vl.addWidget(api_setting_label18)
+            labels_vl.addWidget(api_setting_label19)
+            labels_vl.addWidget(api_setting_label20)
+            labels_vl.addWidget(api_setting_label21)
+            labels_vl.addWidget(api_setting_label22)
+            labels_vl.addWidget(api_setting_label23)
+        #if case=="tensorflow":
+        #if case=="vosk":
 
         boxes_vl = QVBoxLayout()
 #        boxes_vl.addWidget(self.select_recognizer_dropdown)
         boxes_vl.addWidget(self.select_language_dropdown)
         boxes_vl.addWidget(self.field_to_read_textbox)
-        boxes_vl.addWidget(self.api_key_textbox01) #name07
-        boxes_vl.addWidget(self.api_key_textbox02)
-        boxes_vl.addWidget(self.api_key_textbox03)
-        boxes_vl.addWidget(self.api_key_textbox04)
-        boxes_vl.addWidget(self.api_key_textbox05)
-        boxes_vl.addWidget(self.api_key_textbox06)
-        boxes_vl.addWidget(self.api_key_textbox07)
-        boxes_vl.addWidget(self.api_key_textbox08)
-        boxes_vl.addWidget(self.api_key_textbox09)
-        boxes_vl.addWidget(self.api_key_textbox10)
-        boxes_vl.addWidget(self.api_key_textbox11)
-        boxes_vl.addWidget(self.api_key_textbox12)
-        boxes_vl.addWidget(self.api_key_textbox13)
-        boxes_vl.addWidget(self.api_key_textbox14)
-        boxes_vl.addWidget(self.api_key_textbox15)
-        boxes_vl.addWidget(self.api_key_textbox16)
-        boxes_vl.addWidget(self.api_key_textbox17)
-        boxes_vl.addWidget(self.api_key_textbox18)
-        boxes_vl.addWidget(self.api_key_textbox19)
-        boxes_vl.addWidget(self.api_key_textbox20)
-        boxes_vl.addWidget(self.api_key_textbox21)
-        boxes_vl.addWidget(self.api_key_textbox22)
-        boxes_vl.addWidget(self.api_key_textbox23)
+        if case=="api":
+            boxes_vl.addWidget(self.api_key_textbox01) #name07
+            boxes_vl.addWidget(self.api_key_textbox02)
+        if case=="bing":
+            boxes_vl.addWidget(self.api_key_textbox03)
+        if case=="google":
+            boxes_vl.addWidget(self.api_key_textbox04)
+        if case=="google_cloud":
+            boxes_vl.addWidget(self.api_key_textbox05)
+        if case=="houndify":
+            boxes_vl.addWidget(self.api_key_textbox06)
+            boxes_vl.addWidget(self.api_key_textbox07)
+        if case=="ibm":
+            boxes_vl.addWidget(self.api_key_textbox08)
+            boxes_vl.addWidget(self.api_key_textbox09)
+        #if case=="sphinx":
+        if case=="wit":
+            boxes_vl.addWidget(self.api_key_textbox10)
+        if case=="azure":
+            boxes_vl.addWidget(self.api_key_textbox11)
+            boxes_vl.addWidget(self.api_key_textbox12)
+        if case=="amazon-lex":
+            boxes_vl.addWidget(self.api_key_textbox13)
+            boxes_vl.addWidget(self.api_key_textbox14)
+            boxes_vl.addWidget(self.api_key_textbox15)
+            boxes_vl.addWidget(self.api_key_textbox16)
+            boxes_vl.addWidget(self.api_key_textbox17)
+        if case=="amazon":
+            boxes_vl.addWidget(self.api_key_textbox18)
+            boxes_vl.addWidget(self.api_key_textbox19)
+            boxes_vl.addWidget(self.api_key_textbox20)
+            boxes_vl.addWidget(self.api_key_textbox21)
+            boxes_vl.addWidget(self.api_key_textbox22)
+            boxes_vl.addWidget(self.api_key_textbox23)
+        #if case=="tensorflow":
+        #if case=="vosk":
 
         my_settings_layout.addLayout(labels_vl)
         my_settings_layout.addLayout(boxes_vl)
@@ -456,29 +483,44 @@ class SRClient(STTClient):
         return my_settings_layout
 
     def save_settings(self):
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME01, self.api_key_textbox01.text()) #name08
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME02, self.api_key_textbox02.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME03, self.api_key_textbox03.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME04, self.api_key_textbox04.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME05, self.api_key_textbox05.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME06, self.api_key_textbox06.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME07, self.api_key_textbox07.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME08, self.api_key_textbox08.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME09, self.api_key_textbox09.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME10, self.api_key_textbox10.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME11, self.api_key_textbox11.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME12, self.api_key_textbox12.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME13, self.api_key_textbox13.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME14, self.api_key_textbox14.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME15, self.api_key_textbox15.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME16, self.api_key_textbox16.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME17, self.api_key_textbox17.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME18, self.api_key_textbox18.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME19, self.api_key_textbox19.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME20, self.api_key_textbox20.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME21, self.api_key_textbox21.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME22, self.api_key_textbox22.text())
-        self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME23, self.api_key_textbox23.text())
+        case = name = self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        #case = name = self.my_settings.value(STT_CLIENT_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        if case=="api":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME01, self.api_key_textbox01.text()) #name08
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME02, self.api_key_textbox02.text())
+        if case=="bing":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME03, self.api_key_textbox03.text())
+        if case=="google":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME04, self.api_key_textbox04.text())
+        if case=="google_cloud":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME05, self.api_key_textbox05.text())
+        if case=="houndify":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME06, self.api_key_textbox06.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME07, self.api_key_textbox07.text())
+        if case=="ibm":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME08, self.api_key_textbox08.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME09, self.api_key_textbox09.text())
+        #if case=="sphinx":
+        if case=="wit":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME10, self.api_key_textbox10.text())
+        if case=="azure":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME11, self.api_key_textbox11.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME12, self.api_key_textbox12.text())
+        if case=="amazon-lex":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME13, self.api_key_textbox13.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME14, self.api_key_textbox14.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME15, self.api_key_textbox15.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME16, self.api_key_textbox16.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME17, self.api_key_textbox17.text())
+        if case=="amazon":
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME18, self.api_key_textbox18.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME19, self.api_key_textbox19.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME20, self.api_key_textbox20.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME21, self.api_key_textbox21.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME22, self.api_key_textbox22.text())
+            self.my_settings.setValue(SRClient.API_KEY_SETTING_NAME23, self.api_key_textbox23.text())
+        #if case=="tensorflow":
+        #if case=="vosk":
         self.my_settings.setValue(SRClient.FIELD_TO_READ_SETTING_NAME, self.field_to_read_textbox.text())
 #        self.my_settings.setValue(SRClient.RECOGNIZER_SETTING_NAME, self.select_recognizer_dropdown.currentText())
         self.my_settings.setValue(SRClient.LANGUAGE_SETTING_NAME, self.select_language_dropdown.currentText())

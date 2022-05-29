@@ -290,11 +290,12 @@ class SettingsDialog(QDialog):
         self.service_stack_layout.setCurrentIndex(self.service_combo_box.currentIndex())
 
     def accept(self):
-        self.services[self.service_combo_box.currentIndex()].save_settings()
+        #STT_CLIENT_SETTING_NAME→update_from_settings()→SRClient.RECOGNIZER_SETTING_NAME→save_settings()→sr-api-key#
         current_service_name = self.service_list[self.service_combo_box.currentIndex()]
         self.my_settings.setValue(STT_CLIENT_SETTING_NAME, current_service_name)
         super(SettingsDialog, self).accept()
         self.my_stt_provider.update_from_settings()
+        self.services[self.service_combo_box.currentIndex()].save_settings()
 
     def reject(self):
         super(SettingsDialog, self).reject()
