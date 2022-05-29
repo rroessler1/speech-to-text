@@ -2,6 +2,7 @@ import difflib
 import re
 from unicodedata import category
 
+from aqt import gui_hooks
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
@@ -310,3 +311,12 @@ cp_action.setShortcut(QKeySequence("Ctrl+Shift+S"))
 cps_action = QAction("Test Your Pronunciation Settings", mw)
 cps_action.triggered.connect(settings_dialog)
 mw.form.menuTools.addAction(cps_action)
+
+def maybe_autostart_frontside(card):
+    test_pronunciation() if "stt::autostart::frontside" in card._note.tags else "manually start"
+
+def maybe_autostart_backside(card):
+    test_pronunciation() if "stt::autostart::backside" in card._note.tags else "manually start"
+
+gui_hooks.reviewer_did_show_question.append(maybe_autostart_frontside);
+gui_hooks.reviewer_did_show_answer.append(maybe_autostart_backside);
