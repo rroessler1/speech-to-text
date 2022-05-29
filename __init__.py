@@ -230,7 +230,7 @@ class SettingsDialog(QDialog):
 
         self.base_layout = QVBoxLayout()
         self.service_combo_box = QComboBox()
-        self.service_names = ["Amazon Lex API", "Amazon Transcribe", "API.ai", "AssemblyAI", "CMU Sphinx", "Google Cloud", "Google Cloud Speech", "Google Web Speech API", "Houndify", "IBM Speech to Text", "Microsoft Azure", "Microsoft Azure Speech", "Microsoft Bing Speech", "Tensorflow", "Vosk API", "Wit.ai"]
+        self.service_names = ["Amazon Lex API (requires SpeechRecognition>3.8.1)", "Amazon Transcribe (requires SpeechRecognition>3.8.1)", "API.ai", "AssemblyAI", "CMU Sphinx (works offline)", "Google Cloud", "Google Cloud Speech", "Google Web Speech API", "Houndify", "IBM Speech to Text", "Microsoft Azure", "Microsoft Azure Speech", "Microsoft Bing Voice Recognition (deprecated)", "Tensorflow (requires SpeechRecognition>3.8.1)", "Vosk API (works offline) (requires SpeechRecognition>3.8.1)", "Wit.ai"]
         self.service_combo_box.addItems(self.service_names)
         self.service_list = ["sr-amazon-lex", "sr-amazon", "sr-api", "assemblyai", "sr-sphinx", "google", "sr-google_cloud", "sr-google", "sr-houndify", "sr-ibm", "microsoft", "sr-azure", "sr-bing", "sr-tensorflow", "sr-vosk", "sr-wit"]
         self.services = []
