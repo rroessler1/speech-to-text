@@ -220,13 +220,65 @@ class SRClient(STTClient):
         )
 
     def pre_stt_validate(self):
-        #alert("pre_stt_validate") #FIXME
         """
             Does any required validation before recording audio.
             Specifically, it currently validates the API key is not empty.
             Throws an exception if validation fails.
         """
-        pass
+        case = name = next(
+            iter([tag.partition("stt::service::sr-")[2] for tag in mw.reviewer.card._note.tags if "stt::service::sr-" in tag]),
+            self.my_settings.value(SRClient.RECOGNIZER_SETTING_NAME, "Microsoft Bing Speech", type=str)
+        )
+        sr_api_client_access_token	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME01, "", type=str) #name03
+        sr_api_session_id	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME02, "", type=str)
+        sr_bing_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME03, "", type=str)
+        sr_google_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME04, "", type=str)
+        sr_google_cloud_credentials_json	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME05, "", type=str)
+        sr_houndify_client_id	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME06, "", type=str)
+        sr_houndify_client_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME07, "", type=str)
+        sr_ibm_username	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME08, "", type=str)
+        sr_ibm_password	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME09, "", type=str)
+        sr_wit_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME10, "", type=str)
+        sr_azure_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME11, "", type=str)
+        sr_azure_location	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME12, "", type=str)
+        sr_amazon_lex_bot_name	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME13, "", type=str)
+        sr_amazon_lex_bot_alias	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME14, "", type=str)
+        sr_amazon_lex_user_id	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME15, "", type=str)
+        sr_amazon_lex_access_key_id	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME16, "", type=str)
+        sr_amazon_lex_secret_access_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME17, "", type=str)
+        sr_amazon_bucket_name	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME18, "", type=str)
+        sr_amazon_access_key_id	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME19, "", type=str)
+        sr_amazon_secret_access_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME20, "", type=str)
+        sr_amazon_region	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME21, "", type=str)
+        sr_amazon_job_name	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME22, "", type=str)
+        sr_amazon_file_key	= self.my_settings.value(SRClient.API_KEY_SETTING_NAME23, "", type=str)
+        #switch name:
+        if case=="api" and not(sr_api_client_access_token and sr_api_session_id):
+            raise STTError("Please set sr_api_client_access_token and sr_api_session_id.", True)
+        if case=="bing" and not(sr_bing_key):
+            raise STTError("Please set sr_bing_key.", True)
+        if case=="google" and not(sr_google_key):
+            raise STTError("Please set sr_google_key.", True)
+        if case=="google_cloud" and not(sr_google_cloud_credentials_json):
+            raise STTError("Please set sr_google_cloud_credentials_json.", True)
+        if case=="houndify" and not(sr_houndify_client_id and sr_houndify_client_key):
+            raise STTError("Please set sr_houndify_client_id and sr_houndify_client_key.", True)
+        if case=="ibm" and not(sr_ibm_username and sr_ibm_password):
+            raise STTError("Please set sr_ibm_username and sr_ibm_password.", True)
+        if case=="sphinx":
+            pass
+        if case=="wit" and not(sr_wit_key):
+            raise STTError("Please set sr_wit_key.", True)
+        if case=="azure"	and not(sr_azure_key):
+            raise STTError("Please set sr_azure_key.", True)
+        if case=="amazon-lex"	and not(sr_amazon_lex_bot_name and sr_amazon_lex_bot_alias and sr_amazon_lex_user_id and sr_amazon_lex_access_key_id and sr_amazon_lex_secret_access_key and sr_amazon_lex_region):
+            raise STTError("Please set sr_amazon_lex_bot_name and sr_amazon_lex_bot_alias and sr_amazon_lex_user_id and sr_amazon_lex_access_key_id and sr_amazon_lex_secret_access_key and sr_amazon_lex_region.", True)
+        if case=="amazon" and not(sr_amazon_bucket_name and sr_amazon_access_key_id and sr_amazon_secret_access_key and sr_amazon_region and sr_amazon_job_name and sr_amazon_file_key):
+            raise STTError("Please set sr_amazon_bucket_name and sr_amazon_access_key_id and sr_amazon_secret_access_key and sr_amazon_region and sr_amazon_job_name and sr_amazon_file_key.", True)
+        if case=="tensorflow":
+            pass
+        if case=="vosk":
+            pass
 
     def get_stt_results(self, audio_file_path):
         """
@@ -322,12 +374,12 @@ class SRClient(STTClient):
         api_setting_label15 = QLabel("Lex user_id:")
         api_setting_label16 = QLabel("Lex access_key_id:")
         api_setting_label17 = QLabel("Lex secret_access_key:")
-        api_setting_label18 = QLabel("Amazon bucket_name:")
-        api_setting_label19 = QLabel("Amazon access_key_id:")
-        api_setting_label20 = QLabel("Amazon secret_access_key:")
-        api_setting_label21 = QLabel("Amazon region:")
-        api_setting_label22 = QLabel("Amazon job_name:")
-        api_setting_label23 = QLabel("Amazon file_key:")
+        api_setting_label18 = QLabel("Transcribe bucket_name:")
+        api_setting_label19 = QLabel("Transcribe access_key_id:")
+        api_setting_label20 = QLabel("Transcribe secret_access_key:")
+        api_setting_label21 = QLabel("Transcribe region:")
+        api_setting_label22 = QLabel("Transcribe job_name:")
+        api_setting_label23 = QLabel("Transcribe file_key:")
 
         self.field_to_read_textbox.setText(self.my_settings.value(SRClient.FIELD_TO_READ_SETTING_NAME, SRClient.FIELD_TO_READ_DEFAULT_NAME, type=str))
         field_to_read_setting_label = QLabel("Name of Card Field to Read:")
