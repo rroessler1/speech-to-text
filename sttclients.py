@@ -127,12 +127,16 @@ class AssemblyAIClient(STTClient):
         labels_vl.addWidget(select_language_label)
         labels_vl.addWidget(field_to_read_setting_label)
         labels_vl.addWidget(api_setting_label)
+        urlLink="<a href=\"TODO\">assemblyai link TODO</a>"
 
         boxes_vl = QVBoxLayout()
         boxes_vl.addWidget(self.select_language_dropdown)
         boxes_vl.addWidget(self.field_to_read_textbox)
         boxes_vl.addWidget(self.api_key_textbox)
 
+        url_label = QLabel(urlLink)
+        url_label.setOpenExternalLinks(True)
+        my_settings_layout.addWidget(url_label)
         my_settings_layout.addLayout(labels_vl)
         my_settings_layout.addLayout(boxes_vl)
 
@@ -402,30 +406,40 @@ class SRClient(STTClient):
         if case=="api":
             labels_vl.addWidget(api_setting_label01) #name06
             labels_vl.addWidget(api_setting_label02)
+            urlLink="<a href=\"TODO\">api link TODO</a>"
         if case=="bing":
             labels_vl.addWidget(api_setting_label03)
+            urlLink="<a href=\"https://www.microsoft.com/cognitive-services/en-us/speech-api\">bing link</a>"
         if case=="google":
             labels_vl.addWidget(api_setting_label04)
+            urlLink="<a href=\"TODO\">google link TODO</a>"
         if case=="google_cloud":
             labels_vl.addWidget(api_setting_label05)
+            urlLink="<a href=\"https://cloud.google.com/speech/\">google_cloud link</a>"
         if case=="houndify":
             labels_vl.addWidget(api_setting_label06)
             labels_vl.addWidget(api_setting_label07)
+            urlLink="<a href=\"https://houndify.com/\">houndify link</a>"
         if case=="ibm":
             labels_vl.addWidget(api_setting_label08)
             labels_vl.addWidget(api_setting_label09)
-        #if case=="sphinx":
+            urlLink="<a href=\"http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/speech-to-text.html\">ibm link</a>"
+        if case=="sphinx":
+            urlLink="<a href=\"http://cmusphinx.sourceforge.net/wiki/\">sphinx link</a>"
         if case=="wit":
             labels_vl.addWidget(api_setting_label10)
+            urlLink="<a href=\"https://wit.ai/\">wit link</a>"
         if case=="azure":
             labels_vl.addWidget(api_setting_label11)
             labels_vl.addWidget(api_setting_label12)
+            urlLink="<a href=\"https://azure.microsoft.com/en-us/services/cognitive-services/speech/\">azure link</a>"
         if case=="amazon-lex":
             labels_vl.addWidget(api_setting_label13)
             labels_vl.addWidget(api_setting_label14)
             labels_vl.addWidget(api_setting_label15)
             labels_vl.addWidget(api_setting_label16)
             labels_vl.addWidget(api_setting_label17)
+            urlLink="<a href=\"TODO\">amazon lex link TODO</a>"
         if case=="amazon":
             labels_vl.addWidget(api_setting_label18)
             labels_vl.addWidget(api_setting_label19)
@@ -433,8 +447,11 @@ class SRClient(STTClient):
             labels_vl.addWidget(api_setting_label21)
             labels_vl.addWidget(api_setting_label22)
             labels_vl.addWidget(api_setting_label23)
-        #if case=="tensorflow":
-        #if case=="vosk":
+            urlLink="<a href=\"TODO\">amazon transcribe link TODO</a>"
+        if case=="tensorflow":
+            urlLink="<a href=\"https://www.tensorflow.org/\">tensorflow link</a>"
+        if case=="vosk":
+            urlLink="<a href=\"https://github.com/alphacep/vosk-api/\">vosk link</a>"
 
         boxes_vl = QVBoxLayout()
 #        boxes_vl.addWidget(self.select_recognizer_dropdown)
@@ -477,6 +494,9 @@ class SRClient(STTClient):
         #if case=="tensorflow":
         #if case=="vosk":
 
+        url_label = QLabel(urlLink)
+        url_label.setOpenExternalLinks(True)
+        my_settings_layout.addWidget(url_label)
         my_settings_layout.addLayout(labels_vl)
         my_settings_layout.addLayout(boxes_vl)
 
@@ -616,12 +636,16 @@ class GoogleClient(STTClient):
         labels_vl.addWidget(select_language_label)
         labels_vl.addWidget(field_to_read_setting_label)
         labels_vl.addWidget(api_setting_label)
+        urlLink="<a href=\"TODO\">google link TODO</a>"
 
         boxes_vl = QVBoxLayout()
         boxes_vl.addWidget(self.select_language_dropdown)
         boxes_vl.addWidget(self.field_to_read_textbox)
         boxes_vl.addWidget(self.api_key_textbox)
 
+        url_label = QLabel(urlLink)
+        url_label.setOpenExternalLinks(True)
+        my_settings_layout.addWidget(url_label)
         my_settings_layout.addLayout(labels_vl)
         my_settings_layout.addLayout(boxes_vl)
 
@@ -734,6 +758,7 @@ class MicrosoftClient(STTClient):
         labels_vl.addWidget(field_to_read_setting_label)
         labels_vl.addWidget(api_setting_label)
         labels_vl.addWidget(select_region_label)
+        urlLink="<a href=\"TODO\">microsoft link TODO</a>"
 
         boxes_vl = QVBoxLayout()
         boxes_vl.addWidget(self.select_language_dropdown)
@@ -741,6 +766,9 @@ class MicrosoftClient(STTClient):
         boxes_vl.addWidget(self.api_key_textbox)
         boxes_vl.addWidget(self.select_region_dropdown)
 
+        url_label = QLabel(urlLink)
+        url_label.setOpenExternalLinks(True)
+        my_settings_layout.addWidget(url_label)
         my_settings_layout.addLayout(labels_vl)
         my_settings_layout.addLayout(boxes_vl)
 
