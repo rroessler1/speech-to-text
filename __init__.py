@@ -2,6 +2,7 @@ import difflib
 import re
 from unicodedata import category
 
+from aqt import gui_hooks
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
@@ -9,6 +10,10 @@ from aqt.utils import showInfo
 # import all of the Qt GUI library
 from aqt.qt import *
 from aqt.sound import record_audio
+
+addon_dir = os.path.dirname(os.path.realpath(__file__))
+vendor_dir = os.path.join(addon_dir, "_vendor")
+sys.path.append(vendor_dir)
 
 from ._vendor.dragonmapper import hanzi
 from .exceptions import STTError
@@ -39,6 +44,9 @@ def settings_dialog():
 
 
 def test_pronunciation():
+    #maybe change stt_client by tags NOW
+    stt_provider.update_from_settings()
+
     stt_client = stt_provider.stt_client
 
     # If they're not in study mode, use this as a shortcut to open settings
@@ -47,7 +55,11 @@ def test_pronunciation():
         return
 
     # Make sure that the field on the card exists
-    field_to_read = stt_client.get_field_to_read()
+    #field_to_read = stt_client.get_field_to_read()
+    field_to_read = next(
+        iter([tag.partition("stt::field::")[2] for tag in mw.reviewer.card._note.tags if "stt::field::" in tag]),
+        stt_client.get_field_to_read()
+    )
     if field_to_read not in mw.reviewer.card.note():
         show_error_dialog(f'This plugin needs to know which field you are reading. '
                                  f'It\'s looking for a field named: "{field_to_read}", '
@@ -187,7 +199,15 @@ class STTProvider:
         self.update_from_settings()
 
     def update_from_settings(self):
-        self.stt_client_name = self.settings.value(STT_CLIENT_SETTING_NAME, STT_CLIENT_DEFAULT_NAME, type=str)
+        try:
+            #maybe change stt_client by tags
+            self.stt_client_name = next(
+                iter([tag.partition("stt::service::")[2] for tag in mw.reviewer.card._note.tags if "stt::service::" in tag]),
+                self.settings.value(STT_CLIENT_SETTING_NAME, STT_CLIENT_DEFAULT_NAME, type=str)
+            )
+        except AttributeError as e:
+            #not at a card
+            self.stt_client_name = self.settings.value(STT_CLIENT_SETTING_NAME, STT_CLIENT_DEFAULT_NAME, type=str)
         self.stt_client = sttclients.get_stt_client(self.stt_client_name, self.settings)
 
     def get_stt_client_name(self):
@@ -210,9 +230,9 @@ class SettingsDialog(QDialog):
 
         self.base_layout = QVBoxLayout()
         self.service_combo_box = QComboBox()
-        self.service_names = ["Google Cloud", "Microsoft Azure"]
+        self.service_names = ["Amazon Lex API (requires SpeechRecognition>3.8.1)", "Amazon Transcribe (requires SpeechRecognition>3.8.1)", "API.ai", "AssemblyAI", "CMU Sphinx (works offline)", "Google Cloud", "Google Cloud Speech", "Google Web Speech API", "Houndify", "IBM Speech to Text", "Microsoft Azure", "Microsoft Azure Speech", "Microsoft Bing Voice Recognition (deprecated)", "Tensorflow (requires SpeechRecognition>3.8.1)", "Vosk API (works offline) (requires SpeechRecognition>3.8.1)", "Wit.ai"]
         self.service_combo_box.addItems(self.service_names)
-        self.service_list = ["google", "microsoft"]
+        self.service_list = ["sr-amazon-lex", "sr-amazon", "sr-api", "assemblyai", "sr-sphinx", "google", "sr-google_cloud", "sr-google", "sr-houndify", "sr-ibm", "microsoft", "sr-azure", "sr-bing", "sr-tensorflow", "sr-vosk", "sr-wit"]
         self.services = []
         self.service_combo_box.activated.connect(self.toggle_service)
 
@@ -270,11 +290,12 @@ class SettingsDialog(QDialog):
         self.service_stack_layout.setCurrentIndex(self.service_combo_box.currentIndex())
 
     def accept(self):
-        self.services[self.service_combo_box.currentIndex()].save_settings()
+        #STT_CLIENT_SETTING_NAME→update_from_settings()→SRClient.RECOGNIZER_SETTING_NAME→save_settings()→sr-api-key#
         current_service_name = self.service_list[self.service_combo_box.currentIndex()]
         self.my_settings.setValue(STT_CLIENT_SETTING_NAME, current_service_name)
         super(SettingsDialog, self).accept()
         self.my_stt_provider.update_from_settings()
+        self.services[self.service_combo_box.currentIndex()].save_settings()
 
     def reject(self):
         super(SettingsDialog, self).reject()
@@ -291,3 +312,12 @@ cp_action.setShortcut(QKeySequence("Ctrl+Shift+S"))
 cps_action = QAction("Test Your Pronunciation Settings", mw)
 cps_action.triggered.connect(settings_dialog)
 mw.form.menuTools.addAction(cps_action)
+
+def maybe_autostart_frontside(card):
+    test_pronunciation() if "stt::autostart::frontside" in card._note.tags else "manually start"
+
+def maybe_autostart_backside(card):
+    test_pronunciation() if "stt::autostart::backside" in card._note.tags else "manually start"
+
+gui_hooks.reviewer_did_show_question.append(maybe_autostart_frontside);
+gui_hooks.reviewer_did_show_answer.append(maybe_autostart_backside);
