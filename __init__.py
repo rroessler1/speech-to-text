@@ -1,13 +1,13 @@
 import difflib
 import re
+import sys
 from unicodedata import category
 
+import aqt.qt
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
 from aqt.utils import showInfo
-# import all of the Qt GUI library
-from aqt.qt import *
 from aqt.sound import record_audio
 
 from ._vendor.dragonmapper import hanzi
@@ -159,13 +159,13 @@ def strip_all_punc(s):
     return s.translate(PUNCTUATION_TABLE)
 
 
-def custom_accept(self: QErrorMessage):
-    QErrorMessage.accept(self)
+def custom_accept(self: aqt.qt.QErrorMessage):
+    aqt.qt.QErrorMessage.accept(self)
     settings_dialog()
 
 
 def show_error_dialog(message: str, show_settings_after: bool=False):
-    error_dialog = QErrorMessage(mw)
+    error_dialog = aqt.qt.QErrorMessage(mw)
     error_dialog.setWindowTitle(WINDOW_NAME)
     if show_settings_after:
         error_dialog.accept = lambda: custom_accept(error_dialog)
@@ -173,7 +173,7 @@ def show_error_dialog(message: str, show_settings_after: bool=False):
 
 
 def show_donate_dialog():
-    donate_dialog = QMessageBox(mw)
+    donate_dialog = aqt.qt.QMessageBox(mw)
     donate_dialog.setWindowTitle(WINDOW_NAME)
     donate_dialog.setText("We're extremely grateful for your support! "
                           "Donate here: <a href=\"https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W\">https://www.paypal.com/donate/?hosted_button_id=5SMQLVSC5XA5W</a>")
@@ -182,7 +182,7 @@ def show_donate_dialog():
 
 class STTProvider:
 
-    def __init__(self, settings: QSettings):
+    def __init__(self, settings: aqt.qt.QSettings):
         self.settings = settings
         self.update_from_settings()
 
@@ -197,65 +197,65 @@ class STTProvider:
         return self.stt_client
 
 
-class SettingsDialog(QDialog):
-    _FONT_HEADER = QFont()
+class SettingsDialog(aqt.qt.QDialog):
+    _FONT_HEADER = aqt.qt.QFont()
     _FONT_HEADER.setPointSize(12)
     _FONT_HEADER.setBold(True)
 
-    def __init__(self, my_settings: QSettings, my_stt_provider: STTProvider, *args, **kwargs):
+    def __init__(self, my_settings: aqt.qt.QSettings, my_stt_provider: STTProvider, *args, **kwargs):
         super(SettingsDialog, self).__init__(*args, **kwargs)
         self.setWindowTitle(WINDOW_NAME + " Settings")
         self.my_settings = my_settings
         self.my_stt_provider = my_stt_provider
 
-        self.base_layout = QVBoxLayout()
-        self.service_combo_box = QComboBox()
+        self.base_layout = aqt.qt.QVBoxLayout()
+        self.service_combo_box = aqt.qt.QComboBox()
         self.service_names = ["Google Cloud", "Microsoft Azure"]
         self.service_combo_box.addItems(self.service_names)
         self.service_list = ["google", "microsoft"]
         self.services = []
         self.service_combo_box.activated.connect(self.toggle_service)
 
-        self.service_stack_layout = QStackedLayout()
+        self.service_stack_layout = aqt.qt.QStackedLayout()
         for idx, service_name in enumerate(self.service_list):
-            service_label = QLabel(self.service_names[idx] + " Settings:")
+            service_label = aqt.qt.QLabel(self.service_names[idx] + " Settings:")
             service_label.setFont(self._FONT_HEADER)
 
-            layout = QVBoxLayout()
+            layout = aqt.qt.QVBoxLayout()
             layout.addWidget(service_label)
 
             service = sttclients.get_stt_client(service_name, my_settings)
             self.services.append(service)
             layout.addLayout(service.get_my_settings_layout())
-            layout.setAlignment(Qt.AlignTop)
+            layout.setAlignment(aqt.qt.Qt.AlignmentFlag.AlignTop)
 
-            widget = QWidget()
+            widget = aqt.qt.QWidget()
             widget.setLayout(layout)
             self.service_stack_layout.addWidget(widget)
 
         self.service_combo_box.setCurrentIndex(self.service_list.index(my_stt_provider.stt_client_name))
         self.toggle_service()
 
-        buttons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        buttons = aqt.qt.QDialogButtonBox.StandardButton.Ok | aqt.qt.QDialogButtonBox.StandardButton.Cancel
 
-        self.buttonBox = QDialogButtonBox(buttons)
+        self.buttonBox = aqt.qt.QDialogButtonBox(buttons)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.donateButton = QPushButton()
+        self.donateButton = aqt.qt.QPushButton()
         self.donateButton.setText("Donate \u2764")
         self.donateButton.setFixedWidth(90)
         self.donateButton.clicked.connect(show_donate_dialog)
 
-        select_service_label = QLabel("Select Text-to-Speech Service:")
+        select_service_label = aqt.qt.QLabel("Select Text-to-Speech Service:")
         select_service_label.setFont(self._FONT_HEADER)
 
-        hr = QFrame()
-        hr.setFrameStyle(QFrame.HLine | QFrame.Sunken)
-        hr.setLayout(QVBoxLayout())
-        hr2 = QFrame()
-        hr2.setFrameStyle(QFrame.HLine | QFrame.Sunken)
-        hr2.setLayout(QVBoxLayout())
+        hr = aqt.qt.QFrame()
+        hr.setFrameStyle(aqt.qt.QFrame.Shape.HLine | aqt.qt.QFrame.Shadow.Sunken)
+        hr.setLayout(aqt.qt.QVBoxLayout())
+        hr2 = aqt.qt.QFrame()
+        hr2.setFrameStyle(aqt.qt.QFrame.Shape.HLine | aqt.qt.QFrame.Shadow.Sunken)
+        hr2.setLayout(aqt.qt.QVBoxLayout())
 
         self.base_layout.addWidget(select_service_label)
         self.base_layout.addWidget(self.service_combo_box)
@@ -280,14 +280,14 @@ class SettingsDialog(QDialog):
         super(SettingsDialog, self).reject()
 
 
-app_settings = QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
+app_settings = aqt.qt.QSettings(SETTINGS_ORGANIZATION, SETTINGS_APPLICATION)
 stt_provider = STTProvider(app_settings)
 
-cp_action = QAction("Test Your Pronunciation", mw)
+cp_action = aqt.qt.QAction("Test Your Pronunciation", mw)
 cp_action.triggered.connect(test_pronunciation)
 mw.form.menuTools.addAction(cp_action)
-cp_action.setShortcut(QKeySequence("Ctrl+Shift+S"))
+cp_action.setShortcut(aqt.qt.QKeySequence("Ctrl+Shift+S"))
 
-cps_action = QAction("Test Your Pronunciation Settings", mw)
+cps_action = aqt.qt.QAction("Test Your Pronunciation Settings", mw)
 cps_action.triggered.connect(settings_dialog)
 mw.form.menuTools.addAction(cps_action)
